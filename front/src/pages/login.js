@@ -1,6 +1,10 @@
 import React from 'react'
+import { AppProps } from 'app'// eslint-disable-line
 
-export default function Login() {
+/**
+ * @param {AppProps} props
+ */
+export default function Login({test}) {
     return (
         <p>Login</p>
     )

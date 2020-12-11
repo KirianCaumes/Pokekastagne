@@ -1,10 +1,18 @@
 import React from 'react'
 import useLang from 'helpers/useLang'
+import { AppProps } from 'app'// eslint-disable-line
 
-export default function Index() {
+/**
+ * @param {AppProps} props
+ */
+export default function Index({ test, setTest }) {
     const lang = useLang()
 
     return (
-        <p>HomePage {lang('mykey')}</p>
+        <p
+            onClick={() => setTest({ test: 'abc' })}
+        >
+            HomePage {lang('mykey')} {test}
+        </p>
     )
 }
