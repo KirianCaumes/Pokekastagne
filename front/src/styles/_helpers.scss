@@ -1,0 +1,76 @@
+@mixin flex-row {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+@mixin flex-col {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+*.flex-row {
+  @include flex-row();
+  > *.flex-one {
+    flex: 1;
+  }
+}
+
+*.flex-col {
+  @include flex-col();
+  > *.flex-one {
+    flex: 1;
+  }
+}
+
+*.flex-start {
+  justify-content: flex-start !important;
+}
+
+*.flex-end {
+  justify-content: flex-end !important;
+}
+
+*.flex-space-between {
+  justify-content: space-between !important;
+}
+
+*.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+*.no-margin-right {
+  margin-right: 0 !important;
+}
+
+*.no-margin-left {
+  margin-left: 0 !important;
+}
+
+*.is-bold {
+  font-weight: bold !important;
+}
+
+*.is-underline {
+  text-decoration: underline !important;
+}
+
+*.is-light {
+  font-weight: initial !important;
+}
+
+*.is-line-through {
+  text-decoration: line-through !important;
+}
+
+*.is-first-capitalize::first-letter {
+  text-transform: capitalize;
+}
+
+*.is-with-inputs > * {
+  margin: 0 1em 1em;
+  max-width: 300px;
+  width: 100%;
+}

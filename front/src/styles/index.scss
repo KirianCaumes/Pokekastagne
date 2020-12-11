@@ -1,3 +1,45 @@
-body {
-    background: lightgray;
-}
+/***************************
+****** Dependencies 📚 *****
+***************************/
+@import "~bulma/sass/utilities/initial-variables.sass";
+@import "~bulma/sass/utilities/functions.sass";
+@import "~bulma/sass/utilities/derived-variables.sass";
+@import "~bulma/sass/utilities/mixins.sass";
+
+/***************************
+******** Theme 🎨 **********
+***************************/
+@import "./_variables.scss";
+@import "./_helpers.scss";
+@import "./_base.scss";
+
+//Dependencies: We Import bulma after variables to add new colors
+@import "~bulma/bulma.sass";
+
+// @import "~bulma-extensions/bulma-accordion/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-badge/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-calendar/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-carousel/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-checkradio/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-divider/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-iconpicker/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-pageloader/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-pricingtable/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-quickview/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-ribbon/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-slider/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-steps/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-switch/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-tagsinput/src/sass/index.sass";
+// @import "~bulma-extensions/bulma-timeline/src/sass/index.sass";
+
+// @import "~bulma-prefers-dark/bulma-prefers-dark.sass";
+
+/***************************
+********** Pages 📖 ********
+***************************/
+@import "./pages/index.scss";
+
+/***************************
+******* Components 🧱 *****
+***************************/

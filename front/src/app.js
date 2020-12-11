@@ -3,14 +3,16 @@ import { history } from 'helpers/history'
 import { Switch, Router, Route } from 'react-router-dom'
 import { RouteChildrenProps } from 'react-router-dom'// eslint-disable-line
 import { connect } from "react-redux"
-import {PayloadTest, CommonState } from 'redux/slices/common'// eslint-disable-line
+import { PayloadTest, CommonState } from 'redux/slices/common'// eslint-disable-line
 import { setTest } from 'redux/slices/common'
 import Login from 'pages/login'
 import Index from 'pages'
+import withManagers from 'helpers/hocs/withManagers'
+import { ManagersProps } from 'helpers/hocs/withManagers'// eslint-disable-line
 
 /**
  * Global components props
- * @typedef {ReduxProps & RouteChildrenProps} AppProps
+ * @typedef {ReduxProps & RouteChildrenProps & ManagersProps} AppProps
  */
 
 /**
@@ -28,8 +30,8 @@ const mapStateToProps = state => ({
     test: state.common.test,
 })
 
-const _Index = connect(mapStateToProps, mapDispatchToProps)(Index)
-const _Login = connect(mapStateToProps, mapDispatchToProps)(Login)
+const _Index = connect(mapStateToProps, mapDispatchToProps)(withManagers(Index))
+const _Login = connect(mapStateToProps, mapDispatchToProps)(withManagers(Login))
 
 export default function App() {
     return (

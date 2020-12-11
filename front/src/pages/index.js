@@ -1,11 +1,11 @@
 import React from 'react'
-import useLang from 'helpers/useLang'
+import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
 
 /**
  * @param {AppProps} props
  */
-export default function Index({ test, setTest }) {
+export default function Index({ test, setTest, releaseManager }) {
     const lang = useLang()
 
     return (
