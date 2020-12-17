@@ -1,0 +1,30 @@
+{
+  "Users": {
+    "id": "",
+    "email": "string unique",
+    "password": "string encrypted",
+    "username": "string"
+  },
+  "Games": {
+    "Players": [
+      {
+        "User": {},
+        "HP": "number",
+        "Position": "number"
+      },
+      {
+        "User": {},
+        "HP": "number",
+        "Position": "number"
+      },
+      {
+        "User": {},
+        "HP": "number",
+        "Position": "number"
+      }
+    ],
+    "PlayersNumber": "number",
+    "Turn": "number",
+    "TimeLeftToPlay": "time / number (seconds)"
+  }
+}
