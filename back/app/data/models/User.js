@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import {Pokemon} from "./Pokemon";
 
 const {Schema} = mongoose;
 
@@ -11,5 +12,6 @@ export const User = mongoose.model(
         },
         password: String,
         username: String,
+        pokemon: [Pokemon]
     })
 );
