@@ -1,2 +1,21 @@
 main.app-page-index {
+    min-height: 100vh;
+    background-size: auto 100%;
+    background-position: center top;
+    background-repeat: no-repeat;
+    image-rendering: optimizespeed;
+    .logo {
+        display: block;
+        margin: 0 auto;
+    }
+    .button-grid {
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: column;
+        min-height: 50vh;
+        margin: 0 auto;
+        max-width: 750px;
+        + button {
+        }
+    }
 }

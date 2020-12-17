@@ -36,18 +36,19 @@ const _Login = connect(mapStateToProps, mapDispatchToProps)(withManagers(Login))
 export default function App() {
     return (
         <>
-            <p>Hello Pokékastagne</p>
             <Router history={history}>
                 <Switch>
                     <Route
-                        path="/"
-                        component={_Index}
-                        title="Home"
-                    />
-                    <Route
                         path="/login"
                         component={_Login}
-                        title="Home"
+                    />
+                    <Route
+                        path="/"
+                        exact
+                        component={_Index}
+                    />
+                    <Route
+                        component={() => <h1>Page not found 😟</h1>}
                     />
                 </Switch>
             </Router>
