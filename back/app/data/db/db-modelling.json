@@ -3,7 +3,7 @@
     "id": "",
     "email": "string unique",
     "password": "string encrypted",
-    "nickname": "string"
+    "username": "string"
   },
   "Games": {
     "Players": [
