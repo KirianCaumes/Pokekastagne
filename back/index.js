@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path'
+import fs from 'fs'
 
 const app = express();
 
@@ -11,14 +12,13 @@ const CONFIG = {
 
 app.get('/api', (req, res) => {
     res.send('Hello World!')
-    res.send('Hello World!')
 });
 
-
-// Serve static files from the React frontend app
-app.use(express.static(path.join(path.resolve(), '/client')))
-app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')))
-
+if (fs.existsSync(path.join(path.resolve(), '/client'))) {
+    // Serve static files from the React frontend app
+    app.use(express.static(path.join(path.resolve(), '/client')))
+    app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')))
+}
 
 /** Run server */
 app.listen(CONFIG.PORT, () => console.log(`Running on http://${CONFIG.HOST}:${CONFIG.PORT}`))
