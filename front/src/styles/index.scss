@@ -13,6 +13,29 @@
 @import "./_helpers.scss";
 @import "./_base.scss";
 
+//Used to add colors as bulma helpers
+$colors: map-merge(
+    $colors,
+    (
+        "yellow": (
+            $yellow,
+            findColorInvert($yellow),
+        ),
+        "blue": (
+            $blue,
+            findColorInvert($blue),
+        ),
+        "navyblue": (
+            $navyblue,
+            findColorInvert($navyblue),
+        ),
+        "orange": (
+            $orange,
+            findColorInvert($orange),
+        ),
+    )
+);
+
 //Dependencies: We Import bulma after variables to add new colors
 @import "~bulma/bulma.sass";
 

@@ -1,5 +1,5 @@
 /**
- * @typedef {'mykey' | 'test'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout'} TranslateKey
  */
 
 /**
@@ -7,13 +7,25 @@
  * @enum {Object}
  */
 const Translates = {
-    mykey: {
-        fr: 'bla {{txt}} ble',
-        en: 'coucou {{txt}} ble',
+    singleplayer: {
+        fr: 'Partie seul',
+        en: 'Singleplayer',
     },
-    test: {
-        fr: 'bla {{txt}} ble',
-        en: 'bla {{txt}} ble',
+    multiplayer: {
+        fr: 'Multijoueur',
+        en: 'Multiplayer',
+    },
+    howtoplay: {
+        fr: 'Comment jouer ?',
+        en: 'How to play?',
+    },
+    settings: {
+        fr: 'Paramètres',
+        en: 'Settings',
+    },
+    logout: {
+        fr: 'Se déconnecter',
+        en: 'Logout',
     }
 }
 
