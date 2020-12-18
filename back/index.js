@@ -14,8 +14,7 @@ import path from 'path';
  */
 const app = express();
 app.use(bodyParser.json());
-app.use('/api')
-const port = 5000;
+// app.use('/api', null);
 
 /**
  * ROUTES
@@ -32,13 +31,7 @@ const CONFIG = {
 
 app.get('/api', (req, res) => {
     res.send('Hello World!')
-    res.send('Hello World!')
 });
-
-app.get('/', (req, res) => {
-
-});
-
 
 
 // Serve static files from the React frontend app
