@@ -16,6 +16,8 @@ app.use('/api')
 
 const port = 5000;
 
+//app.use('/api/auth', userRoutes);
+
 
 /**
  * ROUTES
