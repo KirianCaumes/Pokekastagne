@@ -1,15 +1,17 @@
 import mongoose from 'mongoose';
-import {User} from "./User";
-import {Coords} from "./Coords";
+import {User, UserSchema} from "./User";
+import {Coords, CoordsSchema} from "./Coords";
 
 const {Schema} = mongoose;
 
-export const Player = mongoose.model(
+export const PlayerSchema = new Schema({
+    user: UserSchema,
+    hp: Number,
+    position: Number,
+    location: CoordsSchema
+});
+
+export const PlayerModel = mongoose.model(
     'Player',
-    new Schema({
-        user: User,
-        hp: Number,
-        position: Number,
-        location: Coords
-    })
+    PlayerSchema
 );

@@ -1,70 +1,27 @@
+'use strict';
+
 import express from 'express';
 import mongoose from 'mongoose';
-import {User} from "./app/data/models/User.js";
-import {mongoUrl} from "./app/data/config/config.main.js";
+import bodyParser from 'body-parser';
+import {mongoUrl} from "./app/config/config.main.js";
+import {userRoutes} from './app/routes/users.router.js';
 
+
+/**
+ * PARAMS
+ */
 const app = express();
+app.use(bodyParser.json());
+app.use('/api')
+
 const port = 5000;
 
-app.route('/users')
-    .post((req, res) => {
-        User.create({
-            email: req.body.email,
-            password: req.body.password,
-            username: req.body.username
-        }, (err, user) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('internal server error.');
-            }
-            res.render(user);
-        });
-    })
 
-app.get('/howto', (req, res) => {
+/**
+ * ROUTES
+ */
+app.use('/api/users', userRoutes);
 
-});
-
-// Not implemented
-app.route('/settings')
-    .get((req, res) => {
-
-    })
-    .post((req, res) => {
-        // Changer les paramètres
-    });
-
-app.route('/play/single')
-    .get((req, res) => {
-
-    })
-    .post((req, res) => {
-
-    });
-
-app.route('/play/single/:id')
-    .get((req, res) => {
-
-    })
-    .post((req, res) => {
-
-    });
-
-app.route('/play/online')
-    .get((req, res) => {
-
-    })
-    .post((req, res) => {
-
-    });
-
-app.route('/play/online/:id')
-    .get((req, res) => {
-
-    })
-    .post((req, res) => {
-
-    });
 
 
 app.get('/', (req, res) => {

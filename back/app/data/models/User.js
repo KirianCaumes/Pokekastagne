@@ -1,17 +1,20 @@
 import mongoose from 'mongoose';
-import {Pokemon} from "./Pokemon";
+import {PokemonSchema} from "./Pokemon.js";
 
 const {Schema} = mongoose;
 
-export const User = mongoose.model(
+
+export const UserSchema = new Schema({
+    email: {
+        type: String,
+        unique: true,
+    },
+    password: String,
+    username: String,
+    pokemon: [PokemonSchema]
+});
+
+export const UserModel = mongoose.model(
     'user',
-    new Schema({
-        email: {
-            type: String,
-            unique: true,
-        },
-        password: String,
-        username: String,
-        pokemon: [Pokemon]
-    })
+    UserSchema
 );

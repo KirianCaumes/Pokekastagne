@@ -2,10 +2,12 @@ import mongoose from 'mongoose';
 
 const {Schema} = mongoose;
 
-export const Pokemon = mongoose.model(
+export const PokemonSchema = new Schema({
+    name: String,
+    atk: Number
+});
+
+export const PokemonModel = mongoose.model(
     'pokemon',
-    new Schema({
-        name: String,
-        atk: Number
-    })
+    PokemonSchema
 );
