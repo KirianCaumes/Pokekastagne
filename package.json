@@ -19,6 +19,6 @@
     },
     "homepage": "https://github.com/KirianCaumes/pokekastagne#readme",
     "engines": {
-        "node": "15.4.x"
+        "node": "14.15.x"
     }
 }
