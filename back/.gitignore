@@ -4,3 +4,6 @@ node_modules
 front/build
 
 .idea/
+
+client/*
+!client/.gitkeep
