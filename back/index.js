@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import {mongoUrl} from "./app/config/config.main.js";
 import {userRoutes} from './app/routes/users.router.js';
 import {authRoutes} from './app/routes/auth.router.js';
-import path from 'path'
+import path from 'path';
 
 
 /**
@@ -24,8 +24,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 
-
-app.get('/', (req, res) => {
 /** @type {object} Express config */
 const CONFIG = {
     PORT: process.env.PORT || 5000,
@@ -37,14 +35,19 @@ app.get('/api', (req, res) => {
     res.send('Hello World!')
 });
 
+app.get('/', (req, res) => {
+
+});
+
+
 
 // Serve static files from the React frontend app
-app.use(express.static(path.join(path.resolve(), '/client')))
-app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')))
+app.use(express.static(path.join(path.resolve(), '/client')));
+app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')));
 
 
 /** Run server */
-app.listen(CONFIG.PORT, () => console.log(`Running on http://${CONFIG.HOST}:${CONFIG.PORT}`))
+app.listen(CONFIG.PORT, () => console.log(`Running on http://${CONFIG.HOST}:${CONFIG.PORT}`));
 
 
 /**

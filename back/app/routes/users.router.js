@@ -84,4 +84,4 @@ userRoutes.route('/:uid/pokemon/:pid')
             });
     })
 
-module.exports = userRoutes;
+export {userRoutes};
