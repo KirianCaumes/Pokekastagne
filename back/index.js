@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import {mongoUrl} from "./app/config/config.main.js";
 import {userRoutes} from './app/routes/users.router.js';
+import {authRoutes} from './app/routes/auth.router.js';
 
 
 /**
@@ -13,15 +14,12 @@ import {userRoutes} from './app/routes/users.router.js';
 const app = express();
 app.use(bodyParser.json());
 app.use('/api')
-
 const port = 5000;
-
-//app.use('/api/auth', userRoutes);
-
 
 /**
  * ROUTES
  */
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 
@@ -34,6 +32,10 @@ app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
 
+
+/**
+ * MONGODB / MONGOOSE
+ */
 mongoose.connect(mongoUrl,
     {
         useNewUrlParser: true,
