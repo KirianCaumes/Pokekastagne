@@ -1,9 +1,11 @@
 import {Router} from 'express';
 
 import {UserModel} from "../data/models/User.js";
-
+import {encrypt} from "../utils/security.utils";
 
 const userRoutes = Router();
+
+// userRoutes.use('/auth', authRoutes);
 
 userRoutes.route('/')
     .get((req, res) => {
@@ -17,14 +19,18 @@ userRoutes.route('/')
             });
     })
     .post((req, res) => {
-        if (req.body.pokemon === undefined || req.body.pokemon === null)
-            req.body.pokemon = [];
+        // Create hash from password
+        const hashPwd = encrypt(req.body.password);
+
+        if (hashPwd === false) {
+            res.status(500).send('issue with the password, aborting.');
+        }
 
         UserModel.create({
             email: req.body.email,
-            password: req.body.password,
             username: req.body.username,
-            pokemon: req.body.pokemon
+            password: hashPwd,
+            skin: req.body.skin
         })
             .then(user => {
                 res.send(user);
@@ -35,53 +41,9 @@ userRoutes.route('/')
             });
     });
 
-userRoutes.route('/:id/pokemon')
-    .get((req, res) => {
-        const id = req.params.id;
-        UserModel.findById(id).exec()
-            .then(pokemon => {
-                res.send(pokemon);
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
-            });
-    })
+userRoutes.route('/login')
     .post((req, res) => {
-        const id = req.params.id;
-
-        UserModel.findById(id).exec()
-            .then(user => {
-                user.pokemon.push(
-                    {
-                        name: req.body.name,
-                        atk: req.body.atk
-                    }
-                )
-                user.save();
-                res.send(user);
-
-            }).catch(err => {
-            console.error(err);
-            res.status(500).send('internal server error.');
-        });
+        // Login user
     });
-
-
-userRoutes.route('/:uid/pokemon/:pid')
-    .get((req, res) => {
-        const userId = req.params.uid;
-        const pokemonId = req.params.pid;
-
-        UserModel.findById(userId).exec()
-            .then(user => {
-                const foundPokemon = user.pokemon.find(el => el._id?.toString() === pokemonId);
-                res.send(foundPokemon);
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
-            });
-    })
 
 export {userRoutes};

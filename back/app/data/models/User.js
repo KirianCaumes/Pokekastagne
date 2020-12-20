@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import {PokemonSchema} from "./Pokemon.js";
 
 const {Schema} = mongoose;
 
@@ -9,9 +8,9 @@ export const UserSchema = new Schema({
         type: String,
         unique: true,
     },
-    password: String,
     username: String,
-    pokemon: [PokemonSchema]
+    password: String,
+    skin: String
 });
 
 export const UserModel = mongoose.model(

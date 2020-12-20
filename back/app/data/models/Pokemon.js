@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 
-const {Schema} = mongoose;
 
-export const PokemonSchema = new Schema({
-    name: String,
-    atk: Number
+export const PokemonSchema = new mongoose.Schema({
+    name: Object,
+    attack: Number
 });
 
 export const PokemonModel = mongoose.model(

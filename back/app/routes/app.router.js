@@ -1,11 +1,18 @@
-app.get('/howto', (req, res) => {
+import {Router} from 'express';
+
+
+const appRoutes = Router();
+
+appRoutes.get('/howto', (req, res) => {
 
 });
 
-app.route('/settings')
+appRoutes.route('/settings')
     .get((req, res) => {
 
     })
     .post((req, res) => {
         // Changer les paramètres
     });
+
+export {appRoutes};
