@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "cd back && npm run serve",
-        "heroku-postbuild": "cd back && npm install && cd ../front && npm install && npm run build && mv build ../back/build/client"
+        "heroku-postbuild": "cd back && npm install && npm run build && cd ../front && npm install && npm run build && mv build ../back/build/client"
     },
     "author": "Pokekastagne",
     "license": "MIT",
