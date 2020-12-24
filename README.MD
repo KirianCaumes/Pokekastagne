@@ -2,6 +2,8 @@
 
 > It's time to Pokékastagne!
 
+Let's play : <https://pokekastagne.herokuapp.com/>
+
 ## Front
 
 ### Install Front
