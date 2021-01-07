@@ -1,14 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import {mongoUrl} from "./app/config/config.main.js";
-import {appRoutes} from "./app/routes/app.router.js";
-import {userRoutes} from './app/routes/users.router.js';
 import path from 'path';
-import {gameRoutes} from "./app/routes/game.router.js";
-import {authenticate} from "./app/security/auth.js";
 import fs from 'fs';
+import dotenv from 'dotenv';
+import {mongoUrl} from "./config/config.main.js";
+import {appRoutes} from "./routes/app.router.js";
+import {userRoutes} from './routes/users.router.js';
+import {gameRoutes} from "./routes/game.router.js";
+import {authenticate} from "./security/auth.js";
 
 /**
  * PARAMS
