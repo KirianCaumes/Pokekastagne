@@ -2,6 +2,7 @@ import {Router} from 'express';
 import {GameModel} from "../data/models/Game.js";
 import {generateCode, getNewGrid} from "../utils/game.utils.js";
 import {getUserFromToken} from "../security/auth";
+import {map} from "../data/maps.js";
 
 const gameRoutes = Router();
 
@@ -56,7 +57,7 @@ gameRoutes.route('/:mode')
             playersAlive: 1, // TODO changer ça
             turnNumber: 1,
             lastActionDate: new Date(), // setting to now???
-            grid: getNewGrid(0, 0),
+            grid: map,
             status: "await",
             gameMode: gameMode
         })
@@ -73,7 +74,20 @@ gameRoutes.route('/:mode')
 
 gameRoutes.route('/:mode/:id')
     .get((req, res) => {
-        // Get a game
+        const gameMode = req.params.mode;
+        const gameCode = req.params.id;
+
+        GameModel.findOne({gameMode: gameMode, gameCode: gameCode}).exec()
+            .then(game => {
+                res.send({
+                    game: game
+                });
+
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).send('Could not fetch the game.');
+            });
     })
     .put((req, res) => {
         const gameMode = req.params.mode;
@@ -152,23 +166,58 @@ gameRoutes.route('/:mode/:id/:move')
 
         GameModel.findOne({gameCode: gameId, mode: gameMode}).exec()
             .then(game => {
+                let currentPlayer = game.players.find(player => player.isYourTurn);
+
                 switch (move) {
                     case 'walk':
                         game.map[destCoords.xCoord][destCoords.yCoord] = {
-                            // Current player
+                            type: 'player',
+                            ...currentPlayer
                         };
 
-                        game.save();
                         break;
                     case 'attack':
+                        const attackedPlayer = game.map[destCoords.xCoord][destCoords.yCoord];
+
+                        attackedPlayer.life -= currentPlayer.pokemon.attack;
+                        if (attackedPlayer.life < 0) attackedPlayer.life = 0;
+                        game.playersAlive -= 1;
+
                         break;
                     case 'catch':
+                        const caughtPokemon = game.map[destCoords.xCoord][destCoords.yCoord];
+                        
+                        currentPlayer.pokemon = caughtPokemon;
+
                         break;
                     case 'skip':
                         break;
                 }
 
-                // TODO actions
+                if (game.playersAlive === 1) {
+                    // currentPlayer won
+                }
+
+                // Next player's turn
+                const currentPlayerIndex = game.players.indexOf(currentPlayer);
+                currentPlayer.isYourTurn = false;
+
+                for (let i = currentPlayerIndex + 1; i < 100; i++) {
+                    if (game.players[i].life > 0) {
+                        game.players[i].isYourTurn = true;
+                        break;
+                    }
+                    if (i + 1 === game.players.length) {
+                        i = 0;
+                    }
+                }
+
+                game.save();
+
+                res.send({
+                    game: game
+                });
+
             })
             .catch(err => {
                 console.error(err);
