@@ -1,15 +1,27 @@
 import mongoose from 'mongoose';
-import {User} from "./User";
-import {Coords} from "./Coords";
+import {UserSchema} from "./User.js";
+import {PokemonSchema} from "./Pokemon.js";
 
 const {Schema} = mongoose;
 
-export const Player = mongoose.model(
+export const PlayerSchema = new Schema({
+    username: String,
+    skin: String,
+    pokemon: PokemonSchema,
+    life: Number,
+    isYourTurn: Boolean,
+    position: Number
+});
+
+// Old version
+export const _PlayerSchema = new Schema({
+    user: UserSchema,
+    hp: Number,
+    position: Number,
+    //location: CoordsSchema
+});
+
+export const PlayerModel = mongoose.model(
     'Player',
-    new Schema({
-        user: User,
-        hp: Number,
-        position: Number,
-        location: Coords
-    })
+    PlayerSchema
 );
