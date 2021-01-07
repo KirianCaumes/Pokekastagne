@@ -8,5 +8,6 @@ front/build
 build
 
 app/client
+client
 
 package-lock.json

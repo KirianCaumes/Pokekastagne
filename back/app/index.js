@@ -4,11 +4,11 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import {mongoUrl} from "./config/config.main.js";
-import {appRoutes} from "./routes/app.router.js";
-import {userRoutes} from './routes/users.router.js';
-import {gameRoutes} from "./routes/game.router.js";
-import {authenticate} from "./security/auth.js";
+import { mongoUrl } from "./config/config.main.js";
+import { appRoutes } from "./routes/app.router.js";
+import { userRoutes } from './routes/users.router.js';
+import { gameRoutes } from "./routes/game.router.js";
+import { authenticate } from "./security/auth.js";
 
 /**
  * PARAMS
@@ -43,14 +43,10 @@ app.get('/api', (req, res) => {
 /**
  * APP
  */
-
-// Serve static files from the React frontend app
-app.use(express.static(path.join(path.resolve(), '/client')));
-app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')));
-if (fs.existsSync(path.join(__dirname, '/client'))) {
+if (fs.existsSync(path.join(path.resolve(), '/client'))) {
     // Serve static files from the React frontend app
-    app.use(express.static(path.join(__dirname, '/client')))
-    app.get('*', (req, res) => res.sendFile(path.join(__dirname + '/client/index.html')))
+    app.use(express.static(path.join(path.resolve(), '/client')))
+    app.get('*', (req, res) => res.sendFile(path.join(path.resolve() + '/client/index.html')))
 }
 
 /** Run server */
