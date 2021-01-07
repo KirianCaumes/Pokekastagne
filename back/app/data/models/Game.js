@@ -1,15 +1,30 @@
 import mongoose from 'mongoose';
-import {Player} from "./Player";
+import {PlayerSchema} from "./Player.js";
 
-const {Schema} = mongoose;
 
-export const Game = mongoose.model(
-    'Game',
-    new Schema({
-        players: [Player],
+export const GameSchema = new mongoose.Schema({
+        creatorId: String,
+        gameCode: String,
+        players: [PlayerSchema],
+        playersAlive: Number,
+        turnNumber: Number,
+        lastActionDate: Date,
+        map: [[]],
+        status: String, // await, running, finished
+        mode: String    // offline, online
+});
+
+// Old version
+export const _GameSchema = new mongoose.Schema({
+        gameCode: String,
+        players: [PlayerSchema],
         playersNumber: Number,
         turnNumber: Number,
         timeLeftToPlay: Number,
         grid: [[]] // A revoir ça
-    })
+});
+
+export const GameModel = mongoose.model(
+    'Game',
+    GameSchema
 );

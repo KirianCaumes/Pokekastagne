@@ -2,14 +2,18 @@ import mongoose from 'mongoose';
 
 const {Schema} = mongoose;
 
-export const User = mongoose.model(
+
+export const UserSchema = new Schema({
+    email: {
+        type: String,
+        unique: true,
+    },
+    username: String,
+    password: String,
+    skin: String
+});
+
+export const UserModel = mongoose.model(
     'user',
-    new Schema({
-        email: {
-            type: String,
-            unique: true,
-        },
-        password: String,
-        username: String,
-    })
+    UserSchema
 );
