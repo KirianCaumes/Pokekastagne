@@ -5,15 +5,9 @@ import { Game } from './objects/game'
 let games = []
 
 new Pretender(function () {
-    this.post('/api/user/login', request => {
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { token: 'abc' } })]
-    }, 500)
-    this.post('/api/user', request => {
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { token: 'abc' } })]
-    }, 500)
-    this.get('/api/user/me', request => {
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { _id: 123, email: 'test@mail.com', username: 'Demo', password: 'abc', skin: 1 } })]
-    }, 500)
+    this.post('/api/user/login', this.passthrough)
+    this.post('/api/user', this.passthrough)
+    this.get('/api/user/me', this.passthrough)
 
     this.get('/api/game/online', this.passthrough)
     this.get('/api/game/offline', request => {

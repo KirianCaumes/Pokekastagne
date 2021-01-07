@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 /**
  * @param {AppProps} props
  */
-export default function Index({ signOut }) {
+export default function Index({ signOut, me }) {
     const lang = useLang()
 
     return (

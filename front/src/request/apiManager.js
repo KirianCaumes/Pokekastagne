@@ -144,7 +144,7 @@ export default class ApiManager {
                 data,
                 params,
                 headers: {
-                    MyToken: localStorage.getItem(process.env.REACT_APP_LOCAL_STORAGE_KEY)
+                    authorization: `Bearer ${localStorage.getItem(process.env.REACT_APP_LOCAL_STORAGE_KEY)}`
                 },
                 responseType: responseType
             }),

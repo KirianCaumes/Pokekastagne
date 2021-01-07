@@ -1,8 +1,8 @@
-import {Router} from 'express';
+import { Router } from 'express';
 
-import {UserModel} from "../data/models/User.js";
-import {compare, encrypt} from "../utils/password.utils.js";
-import {authenticate, getUserFromToken, login} from "../security/auth.js";
+import { UserModel } from "../data/models/User.js";
+import { compare, encrypt } from "../utils/password.utils.js";
+import { authenticate, getUserFromToken, login } from "../security/auth.js";
 
 const userRoutes = Router();
 
@@ -47,7 +47,7 @@ userRoutes.route('/')
                     res.status(500).send('internal server error.');
                 });
         }).catch(err => {
-            console.err(err);
+            console.error(err);
             res.status(500).send('Issue hashing the password, aborting.')
         });
     });
@@ -55,9 +55,9 @@ userRoutes.route('/')
 userRoutes.route('/login')
     .post((req, res) => {
         // Login user
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
-        UserModel.findOne({email: email}).exec()
+        UserModel.findOne({ email: email }).exec()
             .then(_user => {
                 if (!_user) {
                     res.status(404).send('No user found with these credentials.');
@@ -74,7 +74,7 @@ userRoutes.route('/login')
                         res.status(401).send('Wrong password.');
                     }
                 }).catch(err => {
-                    console.err(err);
+                    console.error(err);
                     res.status(500).send('Internal server error, please retry later.');
                 });
 
@@ -90,7 +90,7 @@ userRoutes.route('/me',)
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
-        UserModel.findOne({email: userFromToken.email}).exec()
+        UserModel.findOne({ email: userFromToken.email }).exec()
             .then(_user => {
                 res.send({
                     user: _user
@@ -99,7 +99,7 @@ userRoutes.route('/me',)
             }).catch(err => {
                 console.error(err);
                 res.status(500).send('internal server error.');
-             });
+            });
     });
 
-export {userRoutes};
+export { userRoutes };
