@@ -12,8 +12,6 @@ export const FullLoader = (props) => (
             backgroundImage: `url(${require('assets/img/background.png').default})`
         }}
     >
-        <Loader
-            color="#003a70"
-        />
+        <Loader />
     </div>
 )

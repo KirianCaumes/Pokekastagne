@@ -30,7 +30,7 @@ export default function Index({ signOut }) {
                     <br />
                     <br />
                     <div
-                        className="button-grid"
+                        className="main-content"
                     >
                         <Link
                             className="button is-large is-navyblue is-fullwidth"
@@ -84,7 +84,6 @@ export default function Index({ signOut }) {
                                     </span>
                                 </button>
                             </Columns.Column>
-
                         </Columns>
                     </div>
                 </Container>

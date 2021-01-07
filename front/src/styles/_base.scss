@@ -24,5 +24,32 @@ html {
     textarea {
       resize: vertical;
     }
+    main {
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      image-rendering: optimizespeed;
+      image-rendering: pixelated;
+      background-attachment: fixed;
+      background-color: #319cff;
+      .logo {
+        display: block;
+        margin: 0 auto;
+      }
+      .main-content {
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: column;
+        min-height: 50vh;
+        margin: 0 auto;
+        max-width: 750px;
+        > a.button {
+          @include until($tablet) {
+            margin-bottom: 0.75rem;
+          }
+        }
+      }
+    }
   }
 }

@@ -16,6 +16,7 @@ import 'request/pretender'
 import { init, signIn, signOut } from 'redux/slices/user'// eslint-disable-line
 import { UserState, PayloadInit, PayloadSingIn } from 'redux/slices/user'// eslint-disable-line
 import { PrivateRoute, PublicRoute } from 'components/routes'
+import IdGame from 'pages/[game]/[id]'
 
 /**
  * Global components props
@@ -54,6 +55,7 @@ const _Login = connect(mapStateToProps, mapDispatchToProps)(withManagers(Login))
 const _Register = connect(mapStateToProps, mapDispatchToProps)(withManagers(Register))
 const _Howtoplay = connect(mapStateToProps, mapDispatchToProps)(withManagers(Howtoplay))
 const _IndexGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IndexGame))
+const _IdGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IdGame))
 
 /**
  * @param {AppProps} props
@@ -84,7 +86,14 @@ function _App({ userManager, isAuthenticated, init }) {
             <Router history={history}>
                 <Switch>
                     <PrivateRoute
-                        path="/(singleplayer|multiplayer)"
+                        path="/:gametype(singleplayer|multiplayer)/:id"
+                        component={_IdGame}
+                        isAuthenticated={isAuthenticated}
+                        isInit={isInit}
+                        title="Game!"
+                    />
+                    <PrivateRoute
+                        path="/:gametype(singleplayer|multiplayer)"
                         component={_IndexGame}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}

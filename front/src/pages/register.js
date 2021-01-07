@@ -82,8 +82,8 @@ export default function Register({ userManager, signIn }) {
                         }}
                     >
                         <Columns>
-                            <Columns.Column size="one-third" />
-                            <Columns.Column>
+                            <Columns.Column />
+                            <Columns.Column size="half">
                                 {!!errorMessage &&
                                     <div className="notification is-danger">
                                         <button
@@ -132,7 +132,7 @@ export default function Register({ userManager, signIn }) {
                                         />
                                     </div>
                                 </div>
-                                <div className="buttons">
+                                <div className="flex-row is-space-between">
                                     <button
                                         className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
                                     >
@@ -142,7 +142,7 @@ export default function Register({ userManager, signIn }) {
                                         </span>
                                     </button>
                                     <Link
-                                        className="button is-yellow"
+                                        className="flex-col"
                                         to="/login"
                                         // @ts-ignore
                                         disabled={status === Status.PENDING}
@@ -151,7 +151,7 @@ export default function Register({ userManager, signIn }) {
                                     </Link>
                                 </div>
                             </Columns.Column>
-                            <Columns.Column size="one-third" />
+                            <Columns.Column />
                         </Columns>
                     </form>
                 </Container>

@@ -1,0 +1,31 @@
+@import "../../helpers.scss";
+
+main.app-page-game-index {
+  .main-content {
+    > .one-game {
+      @include flex-row();
+      &:nth-last-child(2) {
+        margin-bottom: 2em;
+      }
+      margin: 1em 0;
+      > a {
+        flex: 1;
+        margin-right: 0.5em;
+        .card {
+          .card-content {
+            padding: 0.75rem 1.5rem;
+          }
+          .card-footer {
+            .card-footer-item {
+              padding: 0.5rem;
+            }
+          }
+        }
+      }
+      > div {
+        @include flex-col();
+        justify-content: flex-end;
+      }
+    }
+  }
+}

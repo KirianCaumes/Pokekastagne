@@ -1,10 +1,19 @@
-import { clientsClaim } from 'workbox-core'
+import { clientsClaim, setCacheNameDetails } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
 import { StaleWhileRevalidate } from 'workbox-strategies'
 
+//Force current sw to be used
 clientsClaim()
+
+/** {@link | https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-core#.setCacheNameDetails} */
+setCacheNameDetails({
+    prefix: 'pokekastagne',
+    suffix: 'v1',
+    precache: 'install-time',
+    runtime: 'run-time'
+})
 
 // @ts-ignore
 precacheAndRoute(self.__WB_MANIFEST)
@@ -34,18 +43,16 @@ registerRoute(
 registerRoute(
     ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'),
     new StaleWhileRevalidate({
-        cacheName: 'images',
+        cacheName: 'pokekastagne-images',
         plugins: [
             new ExpirationPlugin({ maxEntries: 50 }),
         ],
     })
 )
 
-// This allows the web app to trigger skipWaiting via
-// registration.waiting.postMessage({type: 'SKIP_WAITING'})
+//Force current sw to be used
 self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
+    if (event.data && event.data.type === 'SKIP_WAITING')
         // @ts-ignore
         self.skipWaiting()
-    }
 })

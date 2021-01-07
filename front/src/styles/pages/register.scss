@@ -1,19 +1,5 @@
 main.app-page-register {
-    min-height: 100vh;
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    image-rendering: optimizespeed;
-    image-rendering: pixelated;
-    background-color: #319cff;
-    .logo {
-        display: block;
-        margin: 0 auto;
-    }
     .notification {
         padding: 0.5rem 2.5rem 0.5rem 1.5rem;
-    }
-    .buttons {
-        justify-content: space-between;
     }
 }

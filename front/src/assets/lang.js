@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult'} TranslateKey
  */
 
 /**
@@ -46,7 +46,32 @@ const Translates = {
     password: {
         fr: 'Mot de passe',
         en: 'Password',
+    },
+    homepage: {
+        fr: 'Page d\'accueil',
+        en: 'Homepage',
+    },
+    playersAlive: {
+        fr: 'Joueur en vie',
+        en: 'Players alive',
+    },
+    startedAt: {
+        fr: 'Démarrée à',
+        en: 'Started at',
+    },
+    join: {
+        fr: 'Rejoindre',
+        en: 'Join',
+    },
+    create: {
+        fr: 'Créer',
+        en: 'Create',
+    },
+    noResult: {
+        fr: 'Aucun résultat',
+        en: 'No result found',
     }
 }
+
 
 export default Translates

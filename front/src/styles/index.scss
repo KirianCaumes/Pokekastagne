@@ -64,6 +64,8 @@ $colors: map-merge(
 @import "./pages/index.scss";
 @import "./pages/login.scss";
 @import "./pages/register.scss";
+@import "./pages/howtoplay.scss";
+@import "./pages/[game]/index.scss";
 
 /***************************
 ******* Components 🧱 *****

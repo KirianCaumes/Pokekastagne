@@ -40,6 +40,12 @@ export default class ApiManager {
          * @type {string} 
          */
         this.objectName = settings.key?.toLowerCase()
+        /** 
+         * Key to use in api URL
+         * @protected
+         * @type {string} 
+         */
+        this.key = settings.key?.toLowerCase()
 
         /** 
          * List of cancel tokens that can be canceled
@@ -132,7 +138,7 @@ export default class ApiManager {
         return {
             req: axios.request({
                 baseURL: this.baseUrl,
-                url: `${this.objectName}${url.length ? `/${url.join('/')}` : ''}`,
+                url: `${this.key}${url.length ? `/${url.join('/')}` : ''}`,
                 method: method,
                 cancelToken: cancelToken.token,
                 data,

@@ -1,8 +1,9 @@
 import Pretender from 'pretender'
+import { Game } from './objects/game'
 
-/**
- * ⚠ DEV ONLY
- */
+/** @type {Game[]} */
+let games = []
+
 new Pretender(function () {
     this.post('/api/user/login', request => {
         return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { token: 'abc' } })]
@@ -11,82 +12,54 @@ new Pretender(function () {
         return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { token: 'abc' } })]
     }, 500)
     this.get('/api/user/me', request => {
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { email: 'test@mail.com', username: 'Demo', password: 'abc', skin: 1 } })]
+        return [200, { "Content-Type": "application/json" }, JSON.stringify({ user: { _id: 123, email: 'test@mail.com', username: 'Demo', password: 'abc', skin: 1 } })]
     }, 500)
 
-    this.get('/api/param', async request => {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({
-            param: {
-                "abc": [
-                    { key: 1, text: "abc" }
-                ],
-                "def": [
-                    { key: 1, text: "abc" }
-                ],
-                "aze": [
-                    { key: 2, text: "abc" }
-                ]
-            },
-            success: true
-        })]
+    this.get('/api/game/online', this.passthrough)
+    this.get('/api/game/offline', request => {
+        return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
     })
 
-    this.get('/api/release', async request => {
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        const els = []
-        for (let i = 0; i < 555; i++) els.push({ id: i, title: 'toto' + i, year: 1234, desc: 'waw' })
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ release: els })]
+    this.get('/api/game/online/:id', this.passthrough)
+    this.get('/api/game/offline/:id', request => {
+        const game = games.find(x => x._id)
+        if (game)
+            return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
+        else
+            return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
     })
-    this.get('/api/release/:id', async request => {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ release: { id: request.params.id, title: 'toto', year: 1234, desc: 'waw', categories: [2, 3] } })]
+
+    this.post('/api/game/online', this.passthrough)
+    this.post('/api/game/offline', request => {
+        const game = new Game({ ...JSON.parse(request.requestBody), _id: new Date().getUTCMilliseconds() })
+        games = [game, ...games]
+        return [200, { "Content-Type": "application/json" }, JSON.stringify({ game })]
     })
-    // this.get('/api/release/:id', async request => {
-    //     await new Promise(resolve => setTimeout(resolve, 500))
-    //     return [404, { "Content-Type": "application/json" }, JSON.stringify({
-    //         "success": false,
-    //         "statusCode": 404,
-    //         "errors": [
-    //             {
-    //                 "code": "not_found",
-    //                 "description": "Non trouvé",
-    //             }
-    //         ]
-    //     })]
-    // })
-    this.post('/api/release', async request => {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ release: { id: 66, title: '123', year: 1234, desc: 'waw' } })]
+
+    this.put('/api/game/online/:id', this.passthrough)
+    this.put('/api/game/offline/:id', request => {
+        const game = games.find(x => x._id)
+        if (game)
+            return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
+        else
+            return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
     })
-    // this.put('/api/release/:id', async request => {
-    //     await new Promise(resolve => setTimeout(resolve, 500))
-    //     return [200, { "Content-Type": "application/json" }, JSON.stringify({ release: { id: request.params.id, title: 'toto', year: 1234, desc: 'waw' } })]
-    // })
-    this.put('/api/release/:id', async request => {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        return [400, { "Content-Type": "application/json" }, JSON.stringify({
-            "success": false,
-            "statusCode": 400,
-            "errors": [
-                {
-                    "code": "data_not_well_formated",
-                    "description": "Certains champs sont invalides",
-                    "validationResults": [
-                        {
-                            "memberNames": [
-                                "title",
-                                "year"
-                            ],
-                            "errorMessage": "Ce couple Entité et Origine n'existe pas"
-                        }
-                    ]
-                }
-            ]
-        })]
+
+    this.delete('/api/game/online/:id', this.passthrough)
+    this.delete('/api/game/offline/:id', request => {
+        const game = games.find(x => x._id)
+        if (game)
+            return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
+        else
+            return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
     })
-    this.delete('/api/release/:id', async request => {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ release: {} })]
+
+    this.patch('/api/game/online/:id/:action', this.passthrough)
+    this.patch('/api/game/offline/:id/:action', request => {
+        const game = games.find(x => x._id)
+        if (game)
+            return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
+        else
+            return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
     })
 })
