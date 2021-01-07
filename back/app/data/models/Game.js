@@ -11,7 +11,7 @@ export const GameSchema = new mongoose.Schema({
         lastActionDate: Date,
         map: [[]],
         status: String, // await, running, finished
-        mode: String    // offline, online
+        gameMode: String    // offline, online
 });
 
 // Old version

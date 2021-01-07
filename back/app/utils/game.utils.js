@@ -1,13 +1,13 @@
 function generateCode() {
     let result = '';
-    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
+    let strLength = 5;
+    for ( let i = 0; i < strLength; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
 }
-
 
 function initGrid(xLength, yLength) {
     const grid = new Array(xLength);
