@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
 // @ts-ignore
@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom'
 /**
  * @param {AppProps} props
  */
-export default function Login({ userManager, signIn, isAuthenticated }) {
+export default function Register({ userManager, signIn }) {
     /** @type {[string, function(string):any]} Status */
     const [status, setStatus] = React.useState(Status.IDLE)
     /** @type {[User, function(User):any]} User */
@@ -35,7 +35,7 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
             setStatus(Status.PENDING)
             setErrorMessage(null)
             try {
-                const token = (await userManager.login(user))?.token
+                const token = (await userManager.create(user))?.token
                 signIn({ token })
                 history.push('/')
             } catch (error) {
@@ -59,14 +59,9 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
         [user, userManager, signIn]
     )
 
-    useEffect(() => {
-        if (isAuthenticated)
-            history.push('/')
-    }, [isAuthenticated])
-
     return (
         <main
-            className="app-page-login"
+            className="app-page-register"
             style={{
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
@@ -99,6 +94,19 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
                                     </div>
                                 }
                                 <div className="field">
+                                    <label className="label">{lang('username')}</label>
+                                    <div className="control">
+                                        <input
+                                            className="input"
+                                            type="string"
+                                            placeholder={lang('username')}
+                                            disabled={status === Status.PENDING}
+                                            onChange={ev => setUser({ ...user, username: ev.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="field">
                                     <label className="label">{lang('email')}</label>
                                     <div className="control">
                                         <input
@@ -128,18 +136,18 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
                                     <button
                                         className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
                                     >
-                                        <span>{lang('login')}</span>
+                                        <span>{lang('register')}</span>
                                         <span className="icon is-small">
                                             <FontAwesomeIcon icon={faSignInAlt} />
                                         </span>
                                     </button>
                                     <Link
                                         className="button is-yellow"
-                                        to="/register"
+                                        to="/login"
                                         // @ts-ignore
                                         disabled={status === Status.PENDING}
                                     >
-                                        <span>{lang('register')}</span>
+                                        <span>{lang('login')}</span>
                                     </Link>
                                 </div>
                             </Columns.Column>

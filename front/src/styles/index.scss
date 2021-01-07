@@ -62,7 +62,11 @@ $colors: map-merge(
 ********** Pages 📖 ********
 ***************************/
 @import "./pages/index.scss";
+@import "./pages/login.scss";
+@import "./pages/register.scss";
 
 /***************************
 ******* Components 🧱 *****
 ***************************/
+@import "./components/loader.scss";
+@import "./components/full-loader.scss";

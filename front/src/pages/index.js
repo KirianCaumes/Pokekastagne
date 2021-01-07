@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 /**
  * @param {AppProps} props
  */
-export default function Index({ test, setTest, releaseManager }) {
+export default function Index({ signOut }) {
     const lang = useLang()
 
     return (
@@ -63,6 +63,7 @@ export default function Index({ test, setTest, releaseManager }) {
                             <Columns.Column>
                                 <Link
                                     className="button is-large is-yellow is-fullwidth"
+                                    to="/"
                                     // @ts-ignore
                                     disabled
                                 >
@@ -75,7 +76,7 @@ export default function Index({ test, setTest, releaseManager }) {
                             <Columns.Column>
                                 <button
                                     className="button is-large is-orange is-fullwidth"
-                                    onClick={() => console.log("logout")}
+                                    onClick={() => signOut()}
                                 >
                                     <span>{lang('logout')}</span>
                                     <span className="icon is-small">
@@ -88,13 +89,6 @@ export default function Index({ test, setTest, releaseManager }) {
                     </div>
                 </Container>
             </Section>
-
         </main>
-
-        // <p
-        //     onClick={() => setTest({ test: 'abc' })}
-        // >
-        //     HomePage {lang('mykey')} {test}
-        // </p>
     )
 }

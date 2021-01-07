@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password'} TranslateKey
  */
 
 /**
@@ -26,6 +26,26 @@ const Translates = {
     logout: {
         fr: 'Se déconnecter',
         en: 'Logout',
+    },
+    login: {
+        fr: 'Se connecter',
+        en: 'Login',
+    },
+    register: {
+        fr: 'S\'inscrire',
+        en: 'Register',
+    },
+    username: {
+        fr: 'Nom d\'utilisateur',
+        en: 'Username',
+    },
+    email: {
+        fr: 'Mail',
+        en: 'Email',
+    },
+    password: {
+        fr: 'Mot de passe',
+        en: 'Password',
     }
 }
 
