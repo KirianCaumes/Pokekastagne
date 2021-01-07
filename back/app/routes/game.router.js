@@ -1,7 +1,6 @@
 import {Router} from 'express';
 import {GameModel} from "../data/models/Game.js";
-import {generateCode, getNewGrid} from "../utils/game.utils";
-import {PlayerSchema} from "../data/models/Player";
+import {generateCode, getNewGrid} from "../utils/game.utils.js";
 
 const gameRoutes = Router();
 
@@ -54,11 +53,11 @@ gameRoutes.route('/:mode')
 
 gameRoutes.route('/:mode/:id')
     .get((req, res) => {
-
+        // Get a game
     })
     .put((req, res) => {
         const gameMode = req.params.mode;
-
+        // Join a game
         if (!['online', 'offline'].includes(gameMode)) {
             res.status(400).send('Syntax error, check your request url.');
         }
@@ -99,6 +98,7 @@ gameRoutes.route('/:mode/:id/:move')
 
         GameModel.findOne({gameCode: gameId, mode: gameMode}).exec()
             .then(game => {
+                game.map
                 // TODO actions
             })
             .catch(err => {

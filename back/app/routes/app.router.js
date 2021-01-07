@@ -1,9 +1,10 @@
 import {Router} from 'express';
+import {authenticate} from "../security/auth.js";
 
 
 const appRoutes = Router();
 
-appRoutes.get('/howto', (req, res) => {
+appRoutes.get('/howto', authenticate, (req, res) => {
 
 });
 

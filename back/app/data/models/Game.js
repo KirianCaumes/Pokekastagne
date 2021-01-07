@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import {PlayerSchema} from "./Player";
+import {PlayerSchema} from "./Player.js";
 
 
 export const GameSchema = new mongoose.Schema({

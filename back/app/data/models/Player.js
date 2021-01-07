@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import {UserSchema} from "./User";
-import {PokemonSchema} from "./Pokemon";
+import {UserSchema} from "./User.js";
+import {PokemonSchema} from "./Pokemon.js";
 
 const {Schema} = mongoose;
 
