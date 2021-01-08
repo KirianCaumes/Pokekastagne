@@ -61,9 +61,9 @@ gameRoutes.route('/:mode')
                             position: 1
                         }
                     ],
-                    playersAlive: 1, // TODO changer ça mais je sais plus pourquoi mdr
+                    playersAlive: 1, // TODO changer ça / mais je sais plus pourquoi mdr
                     turnNumber: 1,
-                    lastActionDate: new Date(), // setting to now???
+                    startDate: new Date(),
                     map: [[]],
                     status: "await",
                     gameMode: gameMode
@@ -141,11 +141,14 @@ gameRoutes.route('/:mode/:id')
                     position: game.players.length + 1
                 });
                 game.playersAlive++;
-                game.lastActionDate = new Date();
 
                 if (game.playersAlive === 5) {
                     // Start the game
                     game.status = 'running';
+
+                    game.players.forEach(player => {
+                        player.lastActionDate = Date.now();
+                    });
 
                     PokemonModel.find({}).exec()
                         .then(pokemon => {
@@ -237,46 +240,54 @@ gameRoutes.route('/:mode/:id/:move')
             .then(game => {
                 let currentPlayer = game.players.find(player => player.isYourTurn);
 
-                switch (move) {
-                    case 'walk':
-                        game.map = searchAndUpdatePlayerCoords(game.map, currentPlayer);
+                if ((Date.now() - currentPlayer.lastActionDate) / (1000 * 3600 * 24) > 1) {
+                    // Too late
+                    currentPlayer.life = 0;
+                    game.playersAlive -= 1;
 
-                        game.map[destCoords.yCoord][destCoords.xCoord] = {
-                            type: 'player',
-                            ...currentPlayer
-                        };
+                    res.send('Your last move was more than 24h ago, disqualified!');
+                } else {
+                    switch (move) {
+                        case 'walk':
+                            game.map = searchAndUpdatePlayerCoords(game.map, currentPlayer);
 
-                        break;
-                    case 'attack':
-                        const attackedPlayer = game.map[destCoords.yCoord][destCoords.xCoord];
+                            game.map[destCoords.yCoord][destCoords.xCoord] = {
+                                type: 'player',
+                                ...currentPlayer
+                            };
 
-                        attackedPlayer.life -= currentPlayer.pokemon.attack;
+                            break;
+                        case 'attack':
+                            const attackedPlayer = game.map[destCoords.yCoord][destCoords.xCoord];
 
-                        // If the player is DEAD
-                        if (attackedPlayer.life < 0) {
-                            attackedPlayer.life = 0;
-                            game.playersAlive -= 1;
-                        }
+                            attackedPlayer.life -= currentPlayer.pokemon.attack;
 
-                        break;
-                    case 'catch':
-                        const caughtPokemon = game.map[destCoords.yCoord][destCoords.xCoord];
-                        game.map[destCoords.yCoord][destCoords.xCoord] = null;
+                            // If the player is DEAD
+                            if (attackedPlayer.life < 0) {
+                                attackedPlayer.life = 0;
+                                game.playersAlive -= 1;
+                            }
 
-                        if (currentPlayer.pokemon !== null) {
-                            // Set the old pokemon randomly on the map
-                            game.map = summonPokemon(game.map, currentPlayer.pokemon);
-                        }
-                        currentPlayer.pokemon = caughtPokemon;
+                            break;
+                        case 'catch':
+                            const caughtPokemon = game.map[destCoords.yCoord][destCoords.xCoord];
+                            game.map[destCoords.yCoord][destCoords.xCoord] = null;
 
-                        break;
-                    case 'skip':
-                        break;
+                            if (currentPlayer.pokemon !== null) {
+                                // Set the old pokemon randomly on the map
+                                game.map = summonPokemon(game.map, currentPlayer.pokemon);
+                            }
+                            currentPlayer.pokemon = caughtPokemon;
+
+                            break;
+                        case 'skip':
+                            break;
+                    }
                 }
 
                 if (game.playersAlive === 1) {
                     game.status = 'finished';
-                    // currentPlayer won
+                    // currentPlayer won mais on sait pas qui
                 }
 
                 // Next player's turn

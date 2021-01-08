@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { UserModel } from "../data/models/User.js";
 import { compare, encrypt } from "../utils/password.utils.js";
 import { authenticate, getUserFromToken, login } from "../security/auth.js";
+import {skins} from "../data/playerSkins";
 
 const userRoutes = Router();
 
@@ -26,8 +27,14 @@ userRoutes.route('/')
         encrypt(req.body.password).then(hash => {
             if (hash === false) {
                 res.status(500).send('issue with the password, aborting.');
+                return;
             }
             console.log(hash);
+
+            if (!skins.values().includes(req.body.skin)) {
+                res.status(400).send('This skin does not exist. Available skins are : ' + skins.values());
+                return;
+            }
 
             UserModel.create({
                 email: req.body.email,

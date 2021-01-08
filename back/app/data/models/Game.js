@@ -8,7 +8,7 @@ export const GameSchema = new mongoose.Schema({
         players: [PlayerSchema],
         playersAlive: Number,
         turnNumber: Number,
-        lastActionDate: Date,
+        startDate: Date,
         map: [[]],
         pngImg: Number,
         status: String, // await, running, finished

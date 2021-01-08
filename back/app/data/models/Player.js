@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import {UserSchema} from "./User.js";
 import {PokemonSchema} from "./Pokemon.js";
 
 const {Schema} = mongoose;
@@ -11,7 +10,8 @@ export const PlayerSchema = new Schema({
     pokemon: PokemonSchema,
     life: Number,
     isYourTurn: Boolean,
-    position: Number
+    position: Number,
+    lastActionDate: Date
 });
 
 export const PlayerModel = mongoose.model(
