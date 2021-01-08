@@ -24,7 +24,7 @@ function authenticate(req, res, next) {
 
     jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, user) => {
         if (err) {
-            return res.status(401).send('Unauthorized.')
+            return res.status(401).send('Unauthorized.');
         }
 
         req.user = user;

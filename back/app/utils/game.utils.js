@@ -1,4 +1,4 @@
-function generateCode() {
+function generateCode(alreadyUsedCodes) {
     let result = '';
     let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let charactersLength = characters.length;
@@ -6,6 +6,11 @@ function generateCode() {
     for ( let i = 0; i < strLength; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
+
+    if (alreadyUsedCodes.includes(result)) {
+        generateCode(alreadyUsedCodes);
+    }
+
     return result;
 }
 

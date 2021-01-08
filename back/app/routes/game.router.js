@@ -33,51 +33,63 @@ gameRoutes.route('/:mode')
     })
     .post((req, res) => {
         const gameMode = req.params.mode;
-        const generatedCode = generateCode();
+        let generatedCode = '';
 
-        const token = req.headers.authorization.split(' ')[1];
-        const userFromToken = getUserFromToken(token);
+        // Assert that the generatedCode is unique in the database
+        GameModel.find({}).exec()
+            .then(games => {
+                const alreadyUsedCodes = games.map(item => item.gameId);
+                generatedCode = generateCode(alreadyUsedCodes);
 
-        const lifeValue = 100;
+                const token = req.headers.authorization.split(' ')[1];
+                const userFromToken = getUserFromToken(token);
 
-        GameModel.create({
-            creatorId: userFromToken.id,
-            gameCode: generatedCode,
-            players: [
-                {
-                    _id: userFromToken.id,
-                    username: userFromToken.username,
-                    skin: userFromToken.skin,
-                    pokemon: null,
-                    life: lifeValue,
-                    isYourTurn: false,
-                    position: 1
-                }
-            ],
-            playersAlive: 1, // TODO changer ça
-            turnNumber: 1,
-            lastActionDate: new Date(), // setting to now???
-            grid: map,
-            status: "await",
-            gameMode: gameMode
-        })
-            .then(game => {
-                res.send({
-                    game: game
-                });
+                const lifeValue = 100;
+
+                // Create the game
+                GameModel.create({
+                    creatorId: userFromToken.id,
+                    gameId: generatedCode,
+                    players: [
+                        {
+                            _id: userFromToken.id,
+                            username: userFromToken.username,
+                            skin: userFromToken.skin,
+                            pokemon: null,
+                            life: lifeValue,
+                            isYourTurn: false,
+                            position: 1
+                        }
+                    ],
+                    playersAlive: 1, // TODO changer ça
+                    turnNumber: 1,
+                    lastActionDate: new Date(), // setting to now???
+                    grid: map,
+                    status: "await",
+                    gameMode: gameMode
+                })
+                    .then(game => {
+                        res.send({
+                            game: game
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        res.status(500).send('Could not create the game.');
+                    });
             })
             .catch(err => {
                 console.error(err);
-                res.status(500).send('Could not create the game.');
+                res.status(500).send('Could not create the game id, aborting.');
             });
     });
 
 gameRoutes.route('/:mode/:id')
     .get((req, res) => {
         const gameMode = req.params.mode;
-        const gameCode = req.params.id;
+        const gameId = req.params.id;
 
-        GameModel.findOne({gameMode: gameMode, gameCode: gameCode}).exec()
+        GameModel.findOne({gameMode: gameMode, gameId: gameId}).exec()
             .then(game => {
                 res.send({
                     game: game
@@ -91,7 +103,7 @@ gameRoutes.route('/:mode/:id')
     })
     .put((req, res) => {
         const gameMode = req.params.mode;
-        const gameCode = req.params.id;
+        const gameId = req.params.id;
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
         const lifeValue = 100;
@@ -100,7 +112,7 @@ gameRoutes.route('/:mode/:id')
             res.status(400).send('Syntax error, check your request url.');
         }
 
-        GameModel.findOne({gameCode: gameCode, gameMode: gameMode}).exec()
+        GameModel.findOne({gameId: gameId, gameMode: gameMode}).exec()
             .then(game => {
                 game.players.push({
                     _id: userFromToken.id,
@@ -115,7 +127,9 @@ gameRoutes.route('/:mode/:id')
                 game.lastActionDate = new Date();
 
                 if (game.playersAlive === 5) {
+                    // Start the game
                     game.status = 'running';
+                    
                 }
 
                 game.save();
@@ -136,7 +150,7 @@ gameRoutes.route('/:mode/:id')
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
-        GameModel.findOneAndDelete({creatorId: userFromToken.id, gameCode: gameId}).exec()
+        GameModel.findOneAndDelete({creatorId: userFromToken.id, gameId: gameId}).exec()
             .then(deletedGame => {
                 res.send('Successfully deleted!');
             })
@@ -164,7 +178,7 @@ gameRoutes.route('/:mode/:id/:move')
             res.status(400).send('Syntax error for the move, check your request url.');
         }
 
-        GameModel.findOne({gameCode: gameId, mode: gameMode}).exec()
+        GameModel.findOne({gameId: gameId, mode: gameMode}).exec()
             .then(game => {
                 let currentPlayer = game.players.find(player => player.isYourTurn);
 
@@ -195,6 +209,7 @@ gameRoutes.route('/:mode/:id/:move')
                 }
 
                 if (game.playersAlive === 1) {
+                    game.status = 'finished';
                     // currentPlayer won
                 }
 

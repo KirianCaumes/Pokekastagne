@@ -4,7 +4,7 @@ import {PlayerSchema} from "./Player.js";
 
 export const GameSchema = new mongoose.Schema({
         creatorId: String,
-        gameCode: String,
+        gameId: String,
         players: [PlayerSchema],
         playersAlive: Number,
         turnNumber: Number,
@@ -16,7 +16,7 @@ export const GameSchema = new mongoose.Schema({
 
 // Old version
 export const _GameSchema = new mongoose.Schema({
-        gameCode: String,
+        gameId: String,
         players: [PlayerSchema],
         playersNumber: Number,
         turnNumber: Number,
