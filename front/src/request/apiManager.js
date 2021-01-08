@@ -1,6 +1,9 @@
 import axios, { CancelTokenSource, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios' // eslint-disable-line
+import { signOut } from 'redux/slices/user'
+import store from 'redux/store'
 // import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { CancelRequestError } from 'request/errors/cancelRequestError'
+import { NotFoundError } from './errors/notFoundError'
 // import store from 'redux/store'
 import { UnauthorizedError } from './errors/unauthorizedError'
 
@@ -98,12 +101,13 @@ export default class ApiManager {
                 case 400:
                     return err.response?.data?.errors
                 case 401:
-                    //TODO add signout logic
+                    store.dispatch(signOut(undefined))
                     return new UnauthorizedError("Unauthorized")
                 case 403:
+                    store.dispatch(signOut(undefined)) //TODO to be removed ?
                     return err.response?.data?.errors
                 case 404:
-                    return err.response?.data?.errors
+                    return new NotFoundError(err.response?.data?.errors)
                 case 500:
                     return err.response?.data
                 default:

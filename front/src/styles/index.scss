@@ -66,9 +66,11 @@ $colors: map-merge(
 @import "./pages/register.scss";
 @import "./pages/howtoplay.scss";
 @import "./pages/[game]/index.scss";
+@import "./pages/[game]/[id].scss";
 
 /***************************
 ******* Components 🧱 *****
 ***************************/
 @import "./components/loader.scss";
 @import "./components/full-loader.scss";
+@import "./components/general/modal.scss";

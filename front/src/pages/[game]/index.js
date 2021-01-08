@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppProps } from 'app'// eslint-disable-line
 // @ts-ignore
 import { Section, Container, Columns } from 'react-bulma-components'
@@ -13,6 +13,9 @@ import { NotImplementedError } from 'request/errors/notImplementedError'
 import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { UnauthorizedError } from 'request/errors/unauthorizedError'
 import { CancelRequestError } from 'request/errors/cancelRequestError'
+import Modal from 'components/general/modal'
+import { ModalType } from 'components/general/modal'// eslint-disable-line
+import { history } from 'helpers/history'
 
 /**
  * Select lobby
@@ -20,11 +23,18 @@ import { CancelRequestError } from 'request/errors/cancelRequestError'
  */
 export default function IndexGame({ match, me, gameManager }) {
     /** @type {[string, function(string):any]} Status */
-    const [status, setStatus] = React.useState(Status.IDLE)
+    const [status, setStatus] = useState(Status.IDLE)
     /** @type {[boolean, function(boolean):any]} Is offline */
-    const [isOffline] = React.useState(match.params?.gametype === 'singleplayer')
-    /** @type {[Game[], function(Game[]):any]} Is offline */
-    const [games, setGames] = React.useState([])
+    const [isOffline] = useState(match.params?.gametype === 'singleplayer')
+    /** @type {[Game[], function(Game[]):any]} Game */
+    const [games, setGames] = useState([])
+
+    /** @type {[ModalType, function(ModalType):any]} Modal */
+    const [modalCreation, setModalCreation] = useState({ isDisplay: !!false })
+    /** @type {[ModalType, function(ModalType):any]} Modal */
+    const [modalJoin, setModalJoin] = useState({ isDisplay: !!false })
+    /** @type {[Game, function(Game):any]} New game name */
+    const [newGame, setNewGame] = useState(new Game())
 
     const type = useMemo(() => isOffline ? 'offline' : 'online', [isOffline])
 
@@ -57,9 +67,10 @@ export default function IndexGame({ match, me, gameManager }) {
         async () => {
             setStatus(Status.PENDING)
             try {
-                const game = await gameManager.create({ name: 'teeeest' }, type)
+                const game = await gameManager.create(newGame, type)
                 setGames([game, ...games])
                 setStatus(Status.RESOLVED)
+                setNewGame(new Game())
             } catch (error) {
                 switch (error?.constructor) {
                     case CancelRequestError: break
@@ -77,127 +88,212 @@ export default function IndexGame({ match, me, gameManager }) {
                 }
             }
         },
-        [gameManager, type, games]
+        [gameManager, type, games, newGame]
+    )
+
+    const _join = useCallback(
+        async () => {
+            setStatus(Status.PENDING)
+            try {
+                const game = await gameManager.updateById(null, newGame.gameId, type)
+                history.push(`${match.url}/${game.gameId}`)
+                // setGames([game, ...games])
+                // setStatus(Status.RESOLVED)
+                // setNewGame(new Game())
+            } catch (error) {
+                switch (error?.constructor) {
+                    case CancelRequestError: break
+                    case UnauthorizedError:
+                    case InvalidEntityError:
+                        // setErrorField(error.errorField)
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                    case NotImplementedError:
+                    default:
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                }
+            }
+        },
+        [gameManager, type, newGame, match]
     )
 
     const lang = useLang()
 
     return (
-        <main
-            className="app-page-game-index"
-            style={{
-                backgroundImage: `url(${require(`assets/img/${isOffline ? 'background1' : 'background2'}.png`).default})`
-            }}
-        >
-            <Section>
-                <Container>
-                    <img
-                        src={require('assets/img/logo.png').default}
-                        alt="Pokékastagne"
-                        className="logo"
-                    />
-                    <br />
-                    <br />
-                    <div
-                        className="main-content"
-                    >
-                        {![Status.PENDING, Status.IDLE].includes(status) && games?.length > 0 &&
-                            games?.map(game => (
-                                <div
-                                    key={game._id}
-                                    className="one-game"
-                                >
-                                    <Link
-                                        to={`${match.url}/${game._id}`}
+        <>
+            <main
+                className="app-page-game-index"
+                style={{
+                    backgroundImage: `url(${require(`assets/img/${isOffline ? 'background1' : 'background2'}.png`).default})`
+                }}
+            >
+                <Section>
+                    <Container>
+                        <img
+                            src={require('assets/img/logo.png').default}
+                            alt="Pokékastagne"
+                            className="logo"
+                            useMap="#map"
+                        />
+                        <map name="map">
+                            <area shape="rect" coords="34,44,270,350" alt="Computer" href="computer.htm" />
+                            <area shape="rect" coords="290,172,333,250" alt="Phone" href="phone.htm" />
+                            <area shape="circle" coords="337,300,44" alt="Coffee" href="coffee.htm" />
+                        </map>
+                        <br />
+                        <br />
+                        <div
+                            className="main-content"
+                        >
+                            {![Status.PENDING, Status.IDLE].includes(status) && games?.length > 0 &&
+                                games?.map(game => (
+                                    <div
+                                        key={game.gameId}
+                                        className="one-game"
                                     >
-                                        <div
-                                            className="card"
+                                        <Link
+                                            to={`${match.url}/${game.gameId}`}
                                         >
-                                            <div className="card-content">
-                                                <div>{game.name}</div>
-                                            </div>
-                                            <footer className="card-footer">
-                                                <p className="card-footer-item">
-                                                    <span>
-                                                        <FontAwesomeIcon icon={faUsers} /> {lang('playersAlive')}: {game.playersAlive}/{game.players?.length ?? 0}
-                                                    </span>
-                                                </p>
-                                                <p className="card-footer-item">
-                                                    <span>
-                                                        <FontAwesomeIcon icon={faHourglass} /> {lang('startedAt')}: {game.startDate?.toISOString()?.split('T')?.[0]}
-                                                    </span>
-                                                </p>
-                                            </footer>
-                                        </div>
-                                    </Link>
-                                    <div>
-                                        {game.creatorId === me._id &&
-                                            <button
-                                                className="button is-danger"
-                                                onClick={() => null}
+                                            <div
+                                                className="card"
                                             >
-                                                <span className="icon is-small">
-                                                    <FontAwesomeIcon icon={faTrash} />
-                                                </span>
-                                            </button>
-                                        }
+                                                <div className="card-content">
+                                                    <div>{game.name}</div>
+                                                </div>
+                                                <footer className="card-footer">
+                                                    <p className="card-footer-item">
+                                                        <span>
+                                                            <FontAwesomeIcon icon={faUsers} /> {lang('playersAlive')}: {game.playersAlive}/{game.players?.length ?? 0}
+                                                        </span>
+                                                    </p>
+                                                    <p className="card-footer-item">
+                                                        <span>
+                                                            <FontAwesomeIcon icon={faHourglass} /> {lang('startedAt')}: {game.startDate?.toISOString()?.split('T')?.[0]}
+                                                        </span>
+                                                    </p>
+                                                </footer>
+                                            </div>
+                                        </Link>
+                                        <div>
+                                            {game.creatorId === me._id &&
+                                                <button
+                                                    className="button is-danger"
+                                                    onClick={() => null}
+                                                >
+                                                    <span className="icon is-small">
+                                                        <FontAwesomeIcon icon={faTrash} />
+                                                    </span>
+                                                </button>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            ))
-                        }
-                        {![Status.PENDING, Status.IDLE].includes(status) && games?.length <= 0 &&
-                            <p className="has-text-white">{lang('noResult')}</p>
-                        }
+                                ))
+                            }
+                            {![Status.PENDING, Status.IDLE].includes(status) && games?.length <= 0 &&
+                                <h2 className="has-text-black title is-4">{lang('noResult')}</h2>
+                            }
 
-                        {[Status.PENDING, Status.IDLE].includes(status) &&
-                            <Loader />
-                        }
+                            {[Status.PENDING, Status.IDLE].includes(status) &&
+                                <Loader />
+                            }
 
-                        <Columns>
-                            <Columns.Column>
-                                <Link
-                                    className="button is-large is-navyblue is-fullwidth"
-                                    to="/"
-                                >
-                                    <span className="icon is-small">
-                                        <FontAwesomeIcon icon={faHome} />
-                                    </span>
-                                    <span>{lang('homepage')}</span>
-                                </Link>
-                            </Columns.Column>
-                            <Columns.Column>
-                                <Columns>
-                                    {!isOffline &&
+                            <Columns>
+                                <Columns.Column>
+                                    <Link
+                                        className="button is-large is-navyblue is-fullwidth"
+                                        to="/"
+                                    >
+                                        <span className="icon is-small">
+                                            <FontAwesomeIcon icon={faHome} />
+                                        </span>
+                                        <span>{lang('homepage')}</span>
+                                    </Link>
+                                </Columns.Column>
+                                <Columns.Column>
+                                    <Columns>
+                                        {!isOffline &&
+                                            <Columns.Column>
+                                                <button
+                                                    className="button is-large is-blue is-fullwidth"
+                                                    onClick={() => setModalJoin({ isDisplay: true })}
+                                                >
+                                                    <span>{lang('join')}</span>
+                                                    <span className="icon is-small">
+                                                        <FontAwesomeIcon icon={faHandPointUp} />
+                                                    </span>
+                                                </button>
+                                            </Columns.Column>
+                                        }
                                         <Columns.Column>
                                             <button
                                                 className="button is-large is-blue is-fullwidth"
-                                                onClick={() => null}
+                                                onClick={() => setModalCreation({ isDisplay: true })}
                                             >
-                                                <span>{lang('join')}</span>
+                                                <span>{lang('create')}</span>
                                                 <span className="icon is-small">
-                                                    <FontAwesomeIcon icon={faHandPointUp} />
+                                                    <FontAwesomeIcon icon={faPlusSquare} />
                                                 </span>
                                             </button>
                                         </Columns.Column>
-                                    }
-                                    <Columns.Column>
-                                        <button
-                                            className="button is-large is-blue is-fullwidth"
-                                            onClick={() => _upsert()}
-                                        >
-                                            <span>{lang('create')}</span>
-                                            <span className="icon is-small">
-                                                <FontAwesomeIcon icon={faPlusSquare} />
-                                            </span>
-                                        </button>
-                                    </Columns.Column>
-                                </Columns>
-                            </Columns.Column>
-                        </Columns>
+                                    </Columns>
+                                </Columns.Column>
+                            </Columns>
 
+                        </div>
+                    </Container>
+                </Section>
+            </main>
+
+            <Modal
+                isDisplay={modalCreation.isDisplay}
+                title={`${lang('new')} ${lang('game')}`}
+                onClickYes={async () => {
+                    await _upsert()
+                    setModalCreation({ isDisplay: false })
+                }}
+                onClickNo={() => setModalCreation({ isDisplay: false })}
+            >
+                <div className="field">
+                    <label className="label">{lang('name')}</label>
+                    <div className="control">
+                        <input
+                            className="input"
+                            type="text"
+                            placeholder={lang('name')}
+                            value={newGame.name || ''}
+                            onChange={ev => setNewGame({ ...newGame, name: ev.target.value })}
+                            required
+                        />
                     </div>
-                </Container>
-            </Section>
-        </main>
+                </div>
+            </Modal>
+
+            <Modal
+                isDisplay={modalJoin.isDisplay}
+                title={`${lang('join')} ${lang('game')}`}
+                onClickYes={async () => {
+                    await _join()
+                    setModalJoin({ isDisplay: false })
+                }}
+                onClickNo={() => setModalJoin({ isDisplay: false })}
+            >
+                <div className="field">
+                    <label className="label">{lang('code')}</label>
+                    <div className="control">
+                        <input
+                            className="input"
+                            type="text"
+                            placeholder={lang('code')}
+                            value={newGame.gameId || ''}
+                            onChange={ev => setNewGame({ ...newGame, gameId: ev.target.value })}
+                            required
+                        />
+                    </div>
+                </div>
+            </Modal>
+        </>
     )
 }

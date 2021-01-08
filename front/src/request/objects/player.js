@@ -7,12 +7,14 @@ import { User } from "./user"
 export class Player extends User {
     /**
      * @param {object} data  
+     * @param {string=} data.type 
      * @param {object=} data.pokemon
      * @param {string=} data.life
      * @param {string=} data.isYourTurn
      * @param {string=} data.position
      */
     constructor({
+        type = undefined,
         pokemon = undefined,
         life = undefined,
         isYourTurn = undefined,
@@ -20,6 +22,7 @@ export class Player extends User {
         ...data
     } = {}) {
         super(data)
+        this.type = type
         this.pokemon = pokemon ? new Pokemon(pokemon) : null
         this.life = life
         this.isYourTurn = isYourTurn
