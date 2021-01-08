@@ -101,6 +101,20 @@ function summonPokemon(map, pokemon) {
     return map;
 }
 
+function searchAndUpdatePlayerCoords(map, player) {
+    for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+            if (map[i][j].type === 'player') {
+                if (map[i][j]._id === player._id) {
+                    map[i][j] = null;
+                }
+            }
+        }
+    }
+
+    return map;
+}
+
 function shuffleArray(arr) {
     for(let i = arr.length - 1; i > 0; i--){
         const j = Math.floor(Math.random() * i)
@@ -113,4 +127,4 @@ function shuffleArray(arr) {
 }
 
 
-export {generateCode, getNewMap, summonPokemon, shuffleArray};
+export {generateCode, getNewMap, summonPokemon, searchAndUpdatePlayerCoords, shuffleArray};

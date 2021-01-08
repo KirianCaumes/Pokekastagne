@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {GameModel} from "../data/models/Game.js";
 import {PokemonModel} from "../data/models/Pokemon.js";
-import {generateCode, getNewMap, shuffleArray, summonPokemon} from "../utils/game.utils.js";
+import {generateCode, getNewMap, shuffleArray, searchAndUpdatePlayerCoords, summonPokemon} from "../utils/game.utils.js";
 import {getUserFromToken} from "../security/auth.js";
 import {MapModelModel} from "../data/models/MapModel";
 
@@ -46,8 +46,6 @@ gameRoutes.route('/:mode')
                 const token = req.headers.authorization.split(' ')[1];
                 const userFromToken = getUserFromToken(token);
 
-                const lifeValue = 100;
-
                 // Create the game
                 GameModel.create({
                     creatorId: userFromToken.id,
@@ -58,7 +56,7 @@ gameRoutes.route('/:mode')
                             username: userFromToken.username,
                             skin: userFromToken.skin,
                             pokemon: null,
-                            life: lifeValue,
+                            life: process.env.START_LIFE,
                             isYourTurn: false,
                             position: 1
                         }
@@ -108,7 +106,6 @@ gameRoutes.route('/:mode/:id')
         const gameId = req.params.id;
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
-        const lifeValue = 100;
 
         if (!['online', 'offline'].includes(gameMode)) {
             res.status(400).send('Syntax error, check your request url.');
@@ -139,7 +136,7 @@ gameRoutes.route('/:mode/:id')
                     username: userFromToken.username,
                     skin: userFromToken.skin,
                     pokemon: null,
-                    life: lifeValue,
+                    life:  process.env.START_LIFE,
                     isYourTurn: false,
                     position: game.players.length + 1
                 });
@@ -242,7 +239,9 @@ gameRoutes.route('/:mode/:id/:move')
 
                 switch (move) {
                     case 'walk':
-                        game.map[destCoords.xCoord][destCoords.yCoord] = {
+                        game.map = searchAndUpdatePlayerCoords(game.map, currentPlayer);
+
+                        game.map[destCoords.yCoord][destCoords.xCoord] = {
                             type: 'player',
                             ...currentPlayer
                         };
@@ -292,6 +291,11 @@ gameRoutes.route('/:mode/:id/:move')
                     if (i + 1 === game.players.length) {
                         i = 0;
                     }
+                }
+
+                // Increment turn
+                if (game.players.map(p => p.life > 0).indexOf(currentPlayer) === game.players.map(p => p.life > 0).length - 1) {
+                    game.turnNumber += 1;
                 }
 
                 game.save();
