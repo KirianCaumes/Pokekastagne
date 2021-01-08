@@ -10,7 +10,7 @@ function login(user) {
         },
         process.env.JWT_TOKEN_SECRET,
         {
-            expiresIn: '20m'
+            expiresIn: '24h'
         });
 }
 
@@ -24,7 +24,7 @@ function authenticate(req, res, next) {
 
     jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, user) => {
         if (err) {
-            return res.status(403).send('Unauthorized.')
+            return res.status(401).send('Unauthorized.')
         }
 
         req.user = user;
