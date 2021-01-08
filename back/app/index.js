@@ -8,7 +8,10 @@ import { mongoUrl } from "./config/config.main.js";
 import { appRoutes } from "./routes/app.router.js";
 import { userRoutes } from './routes/users.router.js';
 import { gameRoutes } from "./routes/game.router.js";
+import { mapModelRoutes } from "./routes/mapmodel.router.js";
+import {pokemonRoutes} from "./routes/pokemon.router.js";
 import { authenticate } from "./security/auth.js";
+
 
 /**
  * PARAMS
@@ -28,11 +31,14 @@ const CONFIG = {
 
 dotenv.config();
 
+
 /**
  * ROUTES
  */
 app.use('/api', appRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/mapmodel', authenticate, mapModelRoutes);
+app.use('/api/pokemon', authenticate, pokemonRoutes);
 app.use('/api/game', authenticate, gameRoutes);
 
 app.get('/api', (req, res) => {

@@ -1,8 +1,9 @@
 import {Router} from 'express';
 import {GameModel} from "../data/models/Game.js";
-import {generateCode, getNewGrid} from "../utils/game.utils.js";
-import {getUserFromToken} from "../security/auth";
-import {map} from "../data/maps.js";
+import {PokemonModel} from "../data/models/Pokemon.js";
+import {generateCode, getNewMap, shuffleArray, summonPokemon} from "../utils/game.utils.js";
+import {getUserFromToken} from "../security/auth.js";
+import {MapModelModel} from "../data/models/MapModel";
 
 const gameRoutes = Router();
 
@@ -16,6 +17,7 @@ gameRoutes.route('/:mode')
         // Misspelled mode handling
         if (!['online', 'offline'].includes(gameMode)) {
             res.status(400).send('Syntax error, check your request url.');
+            return;
         }
 
         // TODO try to filter in the query
@@ -61,10 +63,10 @@ gameRoutes.route('/:mode')
                             position: 1
                         }
                     ],
-                    playersAlive: 1, // TODO changer ça
+                    playersAlive: 1, // TODO changer ça mais je sais plus pourquoi mdr
                     turnNumber: 1,
                     lastActionDate: new Date(), // setting to now???
-                    grid: map,
+                    map: [[]],
                     status: "await",
                     gameMode: gameMode
                 })
@@ -110,10 +112,28 @@ gameRoutes.route('/:mode/:id')
 
         if (!['online', 'offline'].includes(gameMode)) {
             res.status(400).send('Syntax error, check your request url.');
+            return;
         }
 
         GameModel.findOne({gameId: gameId, gameMode: gameMode}).exec()
             .then(game => {
+                if (game === null) {
+                    res.status(404).send('Cannot find your game! Check your game code.');
+                    return;
+                } else if (game.players.length === 5) {
+                    res.send('The lobby is already full!');
+                    return;
+                } else if (game.status === 'running') {
+                    res.send('The game already started!');
+                    return;
+                } else if (game.status === 'finished') {
+                    res.send('The game is already finished.');
+                    return;
+                }
+                if (game.players.map(p => p._id).includes(userFromToken.id)) {
+                    res.send('You already are in this game!');
+                }
+
                 game.players.push({
                     _id: userFromToken.id,
                     username: userFromToken.username,
@@ -129,14 +149,50 @@ gameRoutes.route('/:mode/:id')
                 if (game.playersAlive === 5) {
                     // Start the game
                     game.status = 'running';
-                    
+
+                    PokemonModel.find({}).exec()
+                        .then(pokemon => {
+                            if (pokemon.length < 5) {
+                                res.status(404).send('Not enough pokemon! Aborting.');
+                                return;
+                            }
+
+                            game.players = shuffleArray(game.players);
+                            for (let i = 0; i < game.players.length; i++) {
+                                game.players[i].position = i + 1;
+                            }
+
+                            // Init map
+                            const shuffled = shuffleArray(pokemon)
+
+                            MapModelModel.find({}).exec()
+                                .then(mapModels => {
+                                    const chosenModel = mapModels[Math.floor(Math.random() * mapModels.length)];
+
+                                    game.map = getNewMap(game.players, shuffled, chosenModel.map);
+                                    game.pngImg = chosenModel.pngImg;
+
+                                    game.save();
+
+                                    res.send({
+                                        game: game
+                                    });
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                    res.status(500).send('Error fetching the mapModel.');
+                                });
+                        }).catch(err => {
+                            console.error(err);
+                            res.status(500).send('Error fetching pokemon.');
+                        });
+                } else {
+                    game.save();
+
+                    res.send({
+                        game: game
+                    });
                 }
-
-                game.save();
-
-                res.send({
-                    game: game
-                });
 
             })
             .catch(err => {
@@ -173,9 +229,11 @@ gameRoutes.route('/:mode/:id/:move')
 
         if (!['online', 'offline'].includes(gameMode)) {
             res.status(400).send('Syntax error for the mode, check your request url.');
+            return;
         }
         if (!['walk', 'attack', 'catch', 'skip'].includes(move)) {
             res.status(400).send('Syntax error for the move, check your request url.');
+            return;
         }
 
         GameModel.findOne({gameId: gameId, mode: gameMode}).exec()
@@ -191,16 +249,25 @@ gameRoutes.route('/:mode/:id/:move')
 
                         break;
                     case 'attack':
-                        const attackedPlayer = game.map[destCoords.xCoord][destCoords.yCoord];
+                        const attackedPlayer = game.map[destCoords.yCoord][destCoords.xCoord];
 
                         attackedPlayer.life -= currentPlayer.pokemon.attack;
-                        if (attackedPlayer.life < 0) attackedPlayer.life = 0;
-                        game.playersAlive -= 1;
+
+                        // If the player is DEAD
+                        if (attackedPlayer.life < 0) {
+                            attackedPlayer.life = 0;
+                            game.playersAlive -= 1;
+                        }
 
                         break;
                     case 'catch':
-                        const caughtPokemon = game.map[destCoords.xCoord][destCoords.yCoord];
-                        
+                        const caughtPokemon = game.map[destCoords.yCoord][destCoords.xCoord];
+                        game.map[destCoords.yCoord][destCoords.xCoord] = null;
+
+                        if (currentPlayer.pokemon !== null) {
+                            // Set the old pokemon randomly on the map
+                            game.map = summonPokemon(game.map, currentPlayer.pokemon);
+                        }
                         currentPlayer.pokemon = caughtPokemon;
 
                         break;

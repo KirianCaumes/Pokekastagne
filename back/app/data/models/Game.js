@@ -10,18 +10,9 @@ export const GameSchema = new mongoose.Schema({
         turnNumber: Number,
         lastActionDate: Date,
         map: [[]],
+        pngImg: Number,
         status: String, // await, running, finished
         gameMode: String    // offline, online
-});
-
-// Old version
-export const _GameSchema = new mongoose.Schema({
-        gameId: String,
-        players: [PlayerSchema],
-        playersNumber: Number,
-        turnNumber: Number,
-        timeLeftToPlay: Number,
-        grid: [[]] // A revoir ça
 });
 
 export const GameModel = mongoose.model(
