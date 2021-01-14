@@ -7,7 +7,7 @@ export class Obstacle {
      * @param {string=} data.type 
      */
     constructor({
-        type = undefined
+        type = 'obstacle'
     } = {}) {
         this.type = type
     }

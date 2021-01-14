@@ -20,7 +20,7 @@ export class Game {
      * @param {('await' | 'running' | 'finished')=} data.status
      * @param {Date=} data.startDate
      * @param {('offline' | 'online')=} data.mode
-     * @param {string=} data.pngImg
+     * @param {number=} data.pngImg
      */
     constructor({
         _id = 0,

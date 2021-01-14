@@ -12,7 +12,7 @@ export class Pokemon {
      */
     constructor({
         _id = 0,
-        type = undefined,
+        type = 'pokemon',
         name = undefined,
         attack = undefined,
         skin = undefined

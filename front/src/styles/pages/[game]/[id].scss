@@ -21,16 +21,48 @@ main.app-page-game-id {
       position: absolute;
     }
     .card {
-      z-index: 1;
+      z-index: 99;
       position: absolute;
       // background: white;
       box-shadow: 0 10px 15px !important;
       .card-content {
-        padding: 0.75em;
+        height: 80px;
+        width: 180px;
+        padding: 0.2em 0.75em;
+        > p {
+          text-align: center;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         > .buttons {
           margin-top: 0.5em;
+          justify-content: center;
         }
       }
+    }
+  }
+  .info-bar {
+    margin: 4px auto 0;
+    background: $navyblue;
+    padding: 0.5em;
+    box-shadow: 0.25em 0.25em black, 0.25em -0.25em black, -0.25em -0.25em black, -0.25em 0.25em black;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    .buttons,
+    button {
+      margin-bottom: 0;
+    }
+
+    // > * {
+    //   &:not(:first-child) {
+    //     margin-left: 1em;
+    //   }
+    // }
+    p {
+      display: inline-block;
+      margin-top: 0.4em;
     }
   }
 }
