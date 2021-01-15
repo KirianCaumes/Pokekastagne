@@ -11,3 +11,5 @@ app/client
 client
 
 package-lock.json
+
+.env
