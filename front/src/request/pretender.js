@@ -11,8 +11,10 @@ const server = new Pretender()
  */
 server.post('/api/user/login', server.passthrough)
 server.post('/api/user', server.passthrough)
+server.post('/api/user/subscribe', server.passthrough)
 server.get('/api/user/me', server.passthrough)
 
+server.post('/api/subscribe', server.passthrough)
 server.get('/api/game/online', server.passthrough)
 server.get('/api/game/online/:id', server.passthrough)
 server.post('/api/game/online', server.passthrough)
