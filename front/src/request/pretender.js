@@ -135,10 +135,17 @@ server.patch('/api/game/offline/:id/:action', request => {
     const currentPlayer = new Player({ ...game.map[currentPlayerPos.y][currentPlayerPos.x] })
     const currentPlayerIndex = game.players.findIndex(x => x.username === currentPlayer.username) //Based on uniq username for test
 
-    const nexPosition = currentPlayer.position < game.players.length ? currentPlayer.position + 1 : 1
+    const nextPosition = (() => {
+        const _getNextPos = (pos = currentPlayer.position) => pos < game.players.length ? pos + 1 : 1
+        let nextPos = _getNextPos()
+        while (game.players.find(x => x.position === nextPos)?.life <= 0) { // eslint-disable-line
+            nextPos = _getNextPos(nextPos > game.players.length ? 1 : nextPos)
+        }
+        return nextPos
+    })()
 
-    const nextPlayer = game.players.find(x => x.position === nexPosition)
-    const nextPlayerIndex = game.players.findIndex(x => x.position === nexPosition)
+    const nextPlayer = game.players.find(x => x.position === nextPosition)
+    const nextPlayerIndex = game.players.findIndex(x => x.position === nextPosition)
     const nextPlayerPos = (() => {
         for (const [y, row] of game.map.entries()) {
             for (const [x, cell] of row.entries()) {
@@ -152,8 +159,13 @@ server.patch('/api/game/offline/:id/:action', request => {
     switch (request.params?.action) {
         case 'walk':
             //Check if pkmn
-            if (game.map[body.y][body.x]?.type === null)
-                throw new Error('Not a pokemon')
+            if (game.map[body.y][body.x]?.type === null) //Not an empty cell
+                break
+
+            currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
+
+            if (currentPlayer.mp < 0) //Not enough mp
+                break
 
             //Clear current player cell
             game.map[currentPlayerPos.y][currentPlayerPos.x] = null
@@ -163,12 +175,42 @@ server.patch('/api/game/offline/:id/:action', request => {
             game.players[currentPlayerIndex] = currentPlayer
             break
         case 'attack':
-            //TODO
+            if (currentPlayer.ap <= 0) //No ap
+                break
+
+            if (!currentPlayer.pokemon) //No pkmn
+                break
+
+            //Update hp of attacked enemy
+            currentPlayer.ap -= 1
+
+            //Get target player
+            const targetPlayer = /** @type {Player} */(game.map[body.y][body.x])
+            const targetPlayerIndex = game.players.findIndex(x => x.username === targetPlayer.username) //Based on uniq username for test
+
+            //Update target player
+            targetPlayer.life -= currentPlayer.pokemon?.attack
+
+            if (targetPlayer.life <= 0)
+                game.playersAlive -= 1
+
+            //Update target player
+            game.map[body.y][body.x] = targetPlayer.life > 0 ? targetPlayer : null
+            game.players[targetPlayerIndex] = targetPlayer
+
+            //Update current player
+            game.map[currentPlayerPos.y][currentPlayerPos.x] = currentPlayer
+            game.players[currentPlayerIndex] = currentPlayer
             break
         case 'catch':
             //Check if pkmn
-            if (game.map[body.y][body.x]?.type !== 'pokemon')
-                throw new Error('Not a pokemon')
+            if (game.map[body.y][body.x]?.type !== 'pokemon') //Not a pokemon
+                break
+
+            currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
+
+            if (currentPlayer.mp < 0) //Not enough mp
+                break
 
             //If has pkmn, put in randomly on map
             if (!!currentPlayer.pokemon) {
@@ -190,8 +232,10 @@ server.patch('/api/game/offline/:id/:action', request => {
             game.players[currentPlayerIndex] = currentPlayer
             break
         case 'skip':
-            //Set player turn is done
+            //Update player
             currentPlayer.isYourTurn = false
+            currentPlayer.ap = 1
+            currentPlayer.mp = 3
 
             //Update new player
             game.map[currentPlayerPos.y][currentPlayerPos.x] = currentPlayer
@@ -203,6 +247,9 @@ server.patch('/api/game/offline/:id/:action', request => {
             //Update pos new player
             game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer
             game.players[nextPlayerIndex] = nextPlayer
+
+            if (nextPosition === 1)
+                game.turnNumber += 1
             break
         default:
             break
@@ -217,13 +264,13 @@ server.patch('/api/game/offline/:id/:action', request => {
 const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
     const myId = (new Date().getUTCMilliseconds() / 2).toString()
 
-    const player1 = new Player({ _id: myId, username: 'Biker', isYourTurn: true, position: 1, skin: 'biker' })
-    const player2 = new Player({ _id: myId, username: 'Cameraman', isYourTurn: false, position: 2, skin: 'cameraman' })
-    const player3 = new Player({ _id: myId, username: 'Clown', isYourTurn: false, position: 3, skin: 'clown' })
-    const player4 = new Player({ _id: myId, username: 'Girl', isYourTurn: false, position: 4, skin: 'girl' })
-    const player5 = new Player({ _id: myId, username: 'Papy', isYourTurn: false, position: 5, skin: 'papy' })
+    const player1 = new Player({ _id: myId, username: 'Biker', isYourTurn: true, position: 1, skin: 'biker', mp: 3, ap: 1, life: 10 })
+    const player2 = new Player({ _id: myId, username: 'Cameraman', isYourTurn: false, position: 2, skin: 'cameraman', mp: 3, ap: 1, life: 10 })
+    const player3 = new Player({ _id: myId, username: 'Clown', isYourTurn: false, position: 3, skin: 'clown', mp: 3, ap: 1, life: 10 })
+    const player4 = new Player({ _id: myId, username: 'Girl', isYourTurn: false, position: 4, skin: 'girl', mp: 3, ap: 1, life: 10 })
+    const player5 = new Player({ _id: myId, username: 'Papy', isYourTurn: false, position: 5, skin: 'papy', mp: 3, ap: 1, life: 10 })
 
-    const pokemon1 = new Pokemon({ _id: 1, name: { en: 'Artikodin', fr: 'Artikodin' }, attack: 5, skin: 'artikodin' })
+    const pokemon1 = new Pokemon({ _id: 1, name: { en: 'Artikodin', fr: 'Artikodin' }, attack: 100, skin: 'artikodin' })
     const pokemon2 = new Pokemon({ _id: 2, name: { en: 'Bulbizarre', fr: 'Bulbizarre' }, attack: 1, skin: 'bulbizarre' })
     const pokemon3 = new Pokemon({ _id: 3, name: { en: 'Charkos', fr: 'Charkos' }, attack: 4, skin: 'charkos' })
     const pokemon4 = new Pokemon({ _id: 4, name: { en: 'Lugia', fr: 'Lugia' }, attack: 5, skin: 'lugia' })
@@ -231,11 +278,13 @@ const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
 
     const customMap = [...map]
 
+    player1.pokemon = pokemon1
+
     customMap[2][0] = player1
-    customMap[12][0] = player2
-    customMap[0][8] = player3
-    customMap[12][8] = player4
-    customMap[17][13] = player5
+    customMap[3][0] = player2
+    customMap[2][1] = player3
+    customMap[2][2] = player4
+    customMap[2][3] = player5
 
     customMap[0][7] = pokemon1
     customMap[4][7] = pokemon2

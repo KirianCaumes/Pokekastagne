@@ -131,7 +131,7 @@ export default function IdGame({ gameManager, match, me }) {
                         case Player:
                             return "rgba(233,212,96,0.4)"
                         default:
-                            return 'rgba(255,255,255,0.4)'
+                            return Math.abs(x - mePlayerPos.x) + Math.abs(y - mePlayerPos.y) <= mePlayer.mp ? 'rgba(255,255,255,0.4)' : 'rgba(207,0,15,0.8)'
                     }
                 })(),
                 props: {
@@ -143,7 +143,7 @@ export default function IdGame({ gameManager, match, me }) {
             })
             ))?.flat() ?? []
         ,
-        [game, border, size]
+        [game, border, size, mePlayerPos?.x, mePlayerPos?.y, mePlayer?.mp]
     )
 
     useEffect(() => {
@@ -221,9 +221,14 @@ export default function IdGame({ gameManager, match, me }) {
                     size={size}
                     border={border}
                     status={status}
+
                     isYourTurn={isYourTurn}
                     isCloseEnough={[0, 1].includes(Math.abs(modalInfos.x - mePlayerPos?.x)) && [0, 1].includes(Math.abs(modalInfos.y - mePlayerPos?.y))}
                     isMe={modalInfos.x === mePlayerPos?.x && modalInfos.y === mePlayerPos?.y}
+                    isAtRange={Math.abs(modalInfos?.x - mePlayerPos?.x) + Math.abs(modalInfos?.y - mePlayerPos?.y) <= mePlayer?.mp}
+                    isEnoughAp={mePlayer?.ap > 0}
+                    hasPkmn={!!mePlayer?.pokemon}
+
                     onHide={() => setModalInfos({ isDisplayed: false })}
                     onAction={
                         /**
@@ -312,6 +317,8 @@ export default function IdGame({ gameManager, match, me }) {
 
                 </div>
                 <div>
+                    <p><b>AP</b>: {mePlayer?.ap ?? 0}</p>&nbsp;/&nbsp;
+                    <p><b>MP</b>: {mePlayer?.mp ?? 0}</p>&nbsp;/&nbsp;
                     <p><b>Your Pokemon</b>: {mePlayer?.pokemon?.name?.en?.toString() ?? <i>None</i>}</p>
                 </div>
                 <div>
@@ -339,13 +346,22 @@ export default function IdGame({ gameManager, match, me }) {
  * @param {boolean} props.isCloseEnough
  * @param {boolean} props.isYourTurn
  * @param {boolean} props.isMe
+ * @param {boolean} props.isAtRange
+ * @param {boolean} props.isEnoughAp
+ * @param {boolean} props.hasPkmn
  */
-function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, onHide = () => null, onAction = () => null, status, isCloseEnough = false, isYourTurn = false, isMe = false }) {
+function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, onHide = () => null, onAction = () => null, status, isCloseEnough = false, isYourTurn = false, isMe = false, isAtRange = false, isEnoughAp = false, hasPkmn = false }) {
     // @ts-ignore
-    _ModalInfos.handleClickOutside = () => isDisplayed ? onHide() : null
+    _ModalInfos.handleClickOutside = () => {
+        setIsShowInfo(false)
+        onHide()
+    }
+
+    /** @type {[boolean, function(boolean):any]} Show info */
+    const [isShowInfo, setIsShowInfo] = useState(!!false)
 
     if (!isDisplayed)
-        return null
+        return <></>
 
     return (
         <div
@@ -383,76 +399,89 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                         }
                     })()}
                 </p>
-                <div className="buttons">
-                    {(() => {
-                        switch (cell?.constructor) {
-                            case Pokemon:
-                                return <>
-                                    <button
-                                        type="button"
-                                        className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
-                                        onClick={() => onHide()} //TODO
-                                    >
-                                        Infos
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
-                                        disabled={!isYourTurn || !isCloseEnough}
-                                        onClick={async () => {
-                                            await onAction({ x, y }, 'catch')
-                                            onHide()
-                                        }}
-                                    >
-                                        Catch
-                                    </button>
-                                </>
-                            case Obstacle:
-                                return null
-                            case Player:
-                                return <>
-                                    <button
-                                        type="button"
-                                        className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
-                                        onClick={async () => { //TODO
-                                            onHide()
-                                        }}
-                                    >
-                                        Infos
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
-                                        disabled={!isYourTurn || !isCloseEnough || isMe}
-                                        onClick={() => onHide()} //TODO
-                                    >
-                                        Attack
-                                    </button>
-                                </>
-                            default:
-                                return <>
-                                    <button
-                                        type="button"
-                                        className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
-                                        disabled={!isYourTurn}
-                                        onClick={async () => {
-                                            await onAction({ x, y }, 'walk')
-                                            onHide()
-                                        }}
-                                    >
-                                        Yes
-                                    </button>
-                                    {/* <button
-                                        type="button"
-                                        className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
-                                        onClick={() => onHide()}
-                                    >
-                                        No
-                                    </button> */}
-                                </>
-                        }
-                    })()}
-                </div>
+                {
+                    isShowInfo ?
+                        <>{(() => {
+                            switch (cell?.constructor) {
+                                case Pokemon:
+                                    return <p>
+                                        <b>Attack</b>: {/** @type {Pokemon} */(cell)?.attack}
+                                    </p>
+                                case Player:
+                                    return <p>
+                                        <b>HP</b>: {/** @type {Player} */(cell)?.life}<br />
+                                        <b>Pokemon</b>: {/** @type {Player} */(cell)?.pokemon?.name?.en ?? <i>None</i>}
+                                    </p>
+                                default:
+                                    return <></>
+                            }
+                        })()}</>
+                        :
+                        <div className="buttons">
+                            {(() => {
+                                switch (cell?.constructor) {
+                                    case Pokemon:
+                                        return <>
+                                            <button
+                                                type="button"
+                                                className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
+                                                onClick={() => setIsShowInfo(true)}
+                                            >
+                                                Infos
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
+                                                disabled={!isYourTurn || !isCloseEnough || !isAtRange}
+                                                onClick={async () => {
+                                                    await onAction({ x, y }, 'catch')
+                                                    onHide()
+                                                }}
+                                            >
+                                                Catch
+                                            </button>
+                                        </>
+                                    case Obstacle:
+                                        return null
+                                    case Player:
+                                        return <>
+                                            <button
+                                                type="button"
+                                                className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
+                                                onClick={() => setIsShowInfo(true)}
+                                            >
+                                                Infos
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
+                                                disabled={!isYourTurn || !isCloseEnough || isMe || !isEnoughAp || !hasPkmn}
+                                                onClick={async () => {
+                                                    await onAction({ x, y }, 'attack')
+                                                    onHide()
+                                                }}
+                                            >
+                                                Attack
+                                            </button>
+                                        </>
+                                    default:
+                                        return <>
+                                            <button
+                                                type="button"
+                                                className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
+                                                disabled={!isYourTurn || !isAtRange}
+                                                onClick={async () => {
+                                                    await onAction({ x, y }, 'walk')
+                                                    onHide()
+                                                }}
+                                            >
+                                                Yes
+                                            </button>
+                                        </>
+                                }
+                            })()}
+                        </div>
+                }
             </div>
         </div>
     )

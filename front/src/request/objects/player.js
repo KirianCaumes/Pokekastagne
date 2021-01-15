@@ -17,9 +17,11 @@ export class Player extends User {
      * 
      * @param {string=} data.type 
      * @param {object=} data.pokemon
-     * @param {string=} data.life
+     * @param {number=} data.life
      * @param {boolean=} data.isYourTurn
      * @param {number=} data.position
+     * @param {number=} data.ap
+     * @param {number=} data.mp
      */
     constructor({
         _id = 0,
@@ -34,6 +36,8 @@ export class Player extends User {
         life = undefined,
         isYourTurn = undefined,
         position = undefined,
+        ap = undefined,
+        mp = undefined,
     } = {}) {
         super({ _id, email, username, password, skin, token })
 
@@ -42,6 +46,8 @@ export class Player extends User {
         this.life = life
         this.isYourTurn = isYourTurn
         this.position = position
+        this.ap = ap
+        this.mp = mp
     }
 }
 
