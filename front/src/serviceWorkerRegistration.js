@@ -49,6 +49,8 @@ export function register(config) {
                 registerValidSW(swUrl, config)
             }
         })
+
+        console.log('Loaded service worker!');
     }
 }
 
@@ -99,7 +101,7 @@ function registerValidSW(swUrl, config) {
 function checkValidServiceWorker(swUrl, config) {
     // Check if the service worker can be found. If it can't reload the page.
     fetch(swUrl, {
-        headers: { 'Service-Worker': 'script' },
+        headers: {'Service-Worker': 'script'},
     })
         .then((response) => {
             // Ensure service worker exists, and that we really are getting a JS file.
@@ -122,6 +124,72 @@ function checkValidServiceWorker(swUrl, config) {
         .catch(() => {
             console.log('No internet connection found. App is running in offline mode.')
         })
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4)
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length)
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
+}
+
+export function initNotificationService() {
+    console.log('Registering push')
+    if ('serviceWorker' in navigator) {
+        console.log('Registering push')
+        navigator.serviceWorker.ready.then(function (registration) {
+            console.log('Registering push')
+            if (!registration.pushManager) {
+                console.warn('Push manager unavailable.')
+                return
+            }
+
+            console.log('hello ' + JSON.stringify(registration))
+
+            registration.pushManager
+                .getSubscription()
+                .then(subscription => {
+                    if (subscription === null) {
+                        registration.pushManager
+                            .subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY)
+                            })
+                            .then(newSub => {
+                                fetch('/api/subscribe', {
+                                    method: 'POST',
+                                    body: JSON.stringify(newSub),
+                                    headers: {
+                                        'content-type': 'application/json'
+                                    }
+                                }).then(() => {
+                                    console.log('Sent push!')
+                                })
+                            })
+                            .catch(err => {
+                                if (Notification.permission !== 'granted') {
+                                    console.log('Permission was not granted.')
+                                } else {
+                                    console.error('An error ocurred during the subscription process.', err)
+                                }
+                            })
+                    } else {
+                        console.log('Registered push!')
+                    }
+                })
+        })
+            .catch(err => {
+                console.error(JSON.stringify(err))
+            })
+    }
 }
 
 export function unregister() {

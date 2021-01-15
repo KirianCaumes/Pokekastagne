@@ -10,7 +10,8 @@ export const UserSchema = new Schema({
     },
     username: String,
     password: String,
-    skin: String
+    skin: String,
+    subscription: Object
 });
 
 export const UserModel = mongoose.model(

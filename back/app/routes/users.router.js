@@ -4,6 +4,7 @@ import { UserModel } from "../data/models/User.js";
 import { compare, encrypt } from "../utils/password.utils.js";
 import { authenticate, getUserFromToken, login } from "../security/auth.js";
 import {skins} from "../data/playerSkins";
+import webpush from "web-push";
 
 const userRoutes = Router();
 
@@ -91,7 +92,33 @@ userRoutes.route('/login')
             });
     });
 
-userRoutes.route('/me',)
+userRoutes.route('/subscribe')
+    .post(authenticate, (req, res) => {
+        const subscription = req.body;
+        const token = req.headers.authorization.split(' ')[1];
+        const userFromToken = getUserFromToken(token);
+
+        UserModel.updateOne({email: userFromToken.email}).exec()
+            .then(user => {
+                user.subscription = subscription;
+
+                user.save();
+            }).catch(err => {
+            console.error(err);
+            res.status(500).send('internal server error.');
+            });
+
+        res.status(201).json({});
+        const payload = JSON.stringify({ title: 'test' });
+
+        console.log(subscription);
+
+        webpush.sendNotification(subscription, payload).catch(err => {
+            console.error(err.stack);
+        });
+    });
+
+userRoutes.route('/me')
     .get(authenticate, (req, res) => {
 
         const token = req.headers.authorization.split(' ')[1];

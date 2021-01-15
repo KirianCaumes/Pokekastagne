@@ -4,6 +4,8 @@ import {PokemonModel} from "../data/models/Pokemon.js";
 import {generateCode, getNewMap, shuffleArray, searchAndUpdatePlayerCoords, summonPokemon} from "../utils/game.utils.js";
 import {getUserFromToken} from "../security/auth.js";
 import {MapModelModel} from "../data/models/MapModel";
+import webpush from "web-push";
+import {UserModel} from "../data/models/User";
 
 const gameRoutes = Router();
 
@@ -281,6 +283,30 @@ gameRoutes.route('/:mode/:id/:move')
 
                             break;
                         case 'skip':
+                            // end of turn
+                            const currentPlayerIndex = game.players.indexOf(currentPlayer);
+                            currentPlayer.isYourTurn = false;
+
+                            for (let i = currentPlayerIndex + 1; i < 100; i++) {
+                                if (game.players[i].life > 0) {
+                                    game.players[i].isYourTurn = true;
+
+                                    UserModel.findOne({_id: game.players[i]._id}).exec()
+                                        .then(user => {
+                                            webpush.sendNotification(user.subscription, {
+                                                title: 'A TOI DE JOUER BONHOMME' // TODO implement better
+                                            }).catch(err => {
+                                                console.error(err.stack);
+                                            });
+                                        });
+
+                                    break;
+                                }
+                                if (i + 1 === game.players.length) {
+                                    i = 0;
+                                }
+                            }
+
                             break;
                     }
                 }
@@ -288,20 +314,6 @@ gameRoutes.route('/:mode/:id/:move')
                 if (game.playersAlive === 1) {
                     game.status = 'finished';
                     // currentPlayer won mais on sait pas qui
-                }
-
-                // Next player's turn
-                const currentPlayerIndex = game.players.indexOf(currentPlayer);
-                currentPlayer.isYourTurn = false;
-
-                for (let i = currentPlayerIndex + 1; i < 100; i++) {
-                    if (game.players[i].life > 0) {
-                        game.players[i].isYourTurn = true;
-                        break;
-                    }
-                    if (i + 1 === game.players.length) {
-                        i = 0;
-                    }
                 }
 
                 // Increment turn

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import path from 'path';
 import fs from 'fs';
+import webpush from 'web-push';
 import dotenv from 'dotenv';
 import { mongoUrl } from "./config/config.main.js";
 import { appRoutes } from "./routes/app.router.js";
@@ -31,6 +32,8 @@ const CONFIG = {
 
 dotenv.config();
 
+webpush.setVapidDetails('mailto:malo.dupont@ynov.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+
 
 /**
  * ROUTES
@@ -43,6 +46,23 @@ app.use('/api/game', authenticate, gameRoutes);
 
 app.get('/api', (req, res) => {
     res.send('Hello World!');
+});
+
+app.post('/api/subscribe', (req, res) => {
+    const subscription = req.body;
+    const payload = JSON.stringify({ title: 'test' });
+
+    console.log(subscription);
+
+    res.status(201).send({
+        sub: subscription,
+        payload: payload
+    });
+
+
+    webpush.sendNotification(subscription, payload).catch(err => {
+        console.error(err.stack);
+    });
 });
 
 
