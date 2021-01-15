@@ -17,9 +17,12 @@ export default function Index({ signOut, me }) {
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
 
-    if (isStandalone) {
-        setIsModalDisplayed(false)
-    }
+    useEffect(() => {
+        if (isStandalone) {
+            setIsModalDisplayed(false)
+        }
+    }, [isStandalone, setIsModalDisplayed])
+
     const lang = useLang()
 
     return (
