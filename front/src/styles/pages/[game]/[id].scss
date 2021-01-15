@@ -105,10 +105,21 @@ main.app-page-game-id {
       background: rgba($color: #000000, $alpha: 0.8);
       z-index: 10;
 
+      div {
+        height: 100%;
+        @include flex-col;
+      }
+
       p {
-        position: absolute;
+        width: 100%;
+        text-align: center;
         font-weight: bold;
-        color: $yellow;
+        display: inline-block;
+        color: $white;
+        font-size: 100px;
+      }
+      .player-number {
+        margin: 0 auto;
       }
     }
   }
