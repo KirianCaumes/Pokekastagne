@@ -11,8 +11,13 @@ import Modal from "../components/general/modal";
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
+
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
+
+    if (navigator.standalone) {
+        setIsModalDisplayed(false);
+    }
     const lang = useLang()
 
     return (
@@ -24,8 +29,10 @@ export default function Index({ signOut, me }) {
         >
            <Modal
                isDisplay={isModalDisplayed}
-               title={'Install!'}
-               onClickYes={() => setIsModalDisplayed(true)}
+               title={lang('install')}
+               onClickYes={() =>  {
+                   // TODO install
+               }}
                onClickNo={() => setIsModalDisplayed(false)}
            >
            </Modal>

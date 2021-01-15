@@ -32,16 +32,16 @@ userRoutes.route('/')
             }
             console.log(hash);
 
-            if (!skins.values().includes(req.body.skin)) {
-                res.status(400).send('This skin does not exist. Available skins are : ' + skins.values());
-                return;
-            }
+            // if (!skins.values().includes(req.body.skin)) {
+            //     res.status(400).send('This skin does not exist. Available skins are : ' + skins.values());
+            //     return;
+            // }
 
             UserModel.create({
                 email: req.body.email,
                 username: req.body.username,
                 password: hash,
-                skin: req.body.skin
+                skin: 'biker'
             })
                 .then(_user => {
                     res.send({

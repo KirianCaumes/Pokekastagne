@@ -62,6 +62,6 @@ self.addEventListener('push', ev => {
     console.log('Got push', data)
     self.registration.showNotification(data.title, {
         body: data.title,
-        icon: 'http://mongoosejs.com/docs/images/mongoose5_62x30_transparent.png'
+        icon: 'http://pokekastagne.herokuapp.com/icon/favicon-96x96-dunplab-manifest-27617.png'
     })
 })
