@@ -63,7 +63,6 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
 
     useEffect(() => {
         if (isAuthenticated) {
-            serviceWorkerRegistration.initNotificationService()
             history.push('/')
         }
     }, [isAuthenticated])

@@ -6,12 +6,17 @@ import { Section, Columns, Container } from 'react-bulma-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
+import * as serviceWorkerRegistration from "../serviceWorkerRegistration";
 
 /**
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
     const lang = useLang()
+
+    if (this.props.isAuthenticated) {
+        serviceWorkerRegistration.initNotificationService()
+    }
 
     return (
         <main
