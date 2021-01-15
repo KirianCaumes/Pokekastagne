@@ -6,6 +6,7 @@ import {getUserFromToken} from "../security/auth.js";
 import {MapModelModel} from "../data/models/MapModel";
 import webpush from "web-push";
 import {UserModel} from "../data/models/User";
+import {GameConstants} from "../data/constants/game.constants";
 
 const gameRoutes = Router();
 
@@ -138,7 +139,9 @@ gameRoutes.route('/:mode/:id')
                     username: userFromToken.username,
                     skin: userFromToken.skin,
                     pokemon: null,
-                    life:  process.env.START_LIFE,
+                    ap: GameConstants.DEFAULT_AP,
+                    mp: GameConstants.DEFAULT_MP,
+                    life:  GameConstants.DEFAULT_START_LIFE,
                     isYourTurn: false,
                     position: game.players.length + 1
                 });

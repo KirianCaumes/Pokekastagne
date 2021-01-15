@@ -142,10 +142,13 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export function initNotificationService() {
-    console.log('Registering push')
+    const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`
+
     if ('serviceWorker' in navigator) {
         console.log('Registering push')
-        navigator.serviceWorker.ready.then(function (registration) {
+        navigator.serviceWorker
+            .register(swUrl)
+            .then(function (registration) {
             console.log('Registering push')
             if (!registration.pushManager) {
                 console.warn('Push manager unavailable.')

@@ -9,6 +9,8 @@ export const PlayerSchema = new Schema({
     skin: String,
     pokemon: PokemonSchema,
     life: Number,
+    ap: Number,
+    mp: Number,
     isYourTurn: Boolean,
     position: Number,
     lastActionDate: Date
