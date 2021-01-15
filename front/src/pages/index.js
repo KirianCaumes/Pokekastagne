@@ -7,16 +7,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import Modal from "../components/general/modal";
+import usePWA from "react-pwa-install-prompt";
 /**
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
+    const { isStandalone, isInstallPromptSupported, promptInstall } = usePWA()
 
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
 
     if (navigator.standalone) {
-        setIsModalDisplayed(false);
+        setIsModalDisplayed(false)
     }
     const lang = useLang()
 
@@ -30,8 +32,11 @@ export default function Index({ signOut, me }) {
            <Modal
                isDisplay={isModalDisplayed}
                title={lang('install')}
-               onClickYes={() =>  {
-                   // TODO install
+               onClickYes={async () =>  {
+                   const didInstall = await promptInstall()
+                   if (didInstall) {
+                       console.log('Installe vite')
+                   }
                }}
                onClickNo={() => setIsModalDisplayed(false)}
            >
