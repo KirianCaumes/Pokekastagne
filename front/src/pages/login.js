@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
+
 // @ts-ignore
 import { Section, Columns, Container } from 'react-bulma-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,6 +15,7 @@ import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { NotImplementedError } from 'request/errors/notImplementedError'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
+import * as serviceWorkerRegistration from "../serviceWorkerRegistration";
 
 /**
  * @param {AppProps} props
@@ -60,8 +62,10 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
     )
 
     useEffect(() => {
-        if (isAuthenticated)
+        if (isAuthenticated) {
+            serviceWorkerRegistration.initNotificationService()
             history.push('/')
+        }
     }, [isAuthenticated])
 
     return (
