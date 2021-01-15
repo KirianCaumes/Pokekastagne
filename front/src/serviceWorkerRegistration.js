@@ -154,8 +154,6 @@ export function initNotificationService() {
                 return
             }
 
-            console.log('hello ' + registration)
-
             registration.pushManager
                 .getSubscription()
                 .then(subscription => {
@@ -166,6 +164,7 @@ export function initNotificationService() {
                                 applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                             })
                             .then(newSub => {
+                                console.log('fetching')
                                 fetch('/api/subscribe', {
                                     method: 'POST',
                                     body: JSON.stringify(newSub),
