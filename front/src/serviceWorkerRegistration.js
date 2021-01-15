@@ -146,8 +146,7 @@ export function initNotificationService() {
 
     if ('serviceWorker' in navigator) {
         console.log('Registering push')
-        navigator.serviceWorker
-            .register(swUrl)
+        navigator.serviceWorker.ready
             .then(function (registration) {
             console.log('Registering push')
             if (!registration.pushManager) {
@@ -155,7 +154,7 @@ export function initNotificationService() {
                 return
             }
 
-            console.log('hello ' + JSON.stringify(registration))
+            console.log('hello ' + registration)
 
             registration.pushManager
                 .getSubscription()
