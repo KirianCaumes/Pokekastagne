@@ -65,7 +65,3 @@ self.addEventListener('push', ev => {
         icon: 'http://mongoosejs.com/docs/images/mongoose5_62x30_transparent.png'
     })
 })
-
-window.addEventListener("appinstalled", event => {
-    fireTracking("PWA app installed by user!!! Hurray");
-})
