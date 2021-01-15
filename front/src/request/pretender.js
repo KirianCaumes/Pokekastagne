@@ -201,6 +201,8 @@ server.patch('/api/game/offline/:id/:action', request => {
             //Update current player
             game.map[currentPlayerPos.y][currentPlayerPos.x] = currentPlayer
             game.players[currentPlayerIndex] = currentPlayer
+
+            game.status = game.playersAlive <= 1 ? 'finished' : 'running'
             break
         case 'catch':
             //Check if pkmn
@@ -270,9 +272,9 @@ const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
     const player4 = new Player({ _id: myId, username: 'Girl', isYourTurn: false, position: 4, skin: 'girl', mp: 3, ap: 1, life: 10 })
     const player5 = new Player({ _id: myId, username: 'Papy', isYourTurn: false, position: 5, skin: 'papy', mp: 3, ap: 1, life: 10 })
 
-    const pokemon1 = new Pokemon({ _id: 1, name: { en: 'Artikodin', fr: 'Artikodin' }, attack: 100, skin: 'artikodin' })
-    const pokemon2 = new Pokemon({ _id: 2, name: { en: 'Bulbizarre', fr: 'Bulbizarre' }, attack: 1, skin: 'bulbizarre' })
-    const pokemon3 = new Pokemon({ _id: 3, name: { en: 'Charkos', fr: 'Charkos' }, attack: 4, skin: 'charkos' })
+    const pokemon1 = new Pokemon({ _id: 1, name: { en: 'Articuno', fr: 'Artikodin' }, attack: 100, skin: 'artikodin' })
+    const pokemon2 = new Pokemon({ _id: 2, name: { en: 'Bulbasaur', fr: 'Bulbizarre' }, attack: 1, skin: 'bulbizarre' })
+    const pokemon3 = new Pokemon({ _id: 3, name: { en: 'Rampardos', fr: 'Charkos' }, attack: 4, skin: 'charkos' })
     const pokemon4 = new Pokemon({ _id: 4, name: { en: 'Lugia', fr: 'Lugia' }, attack: 5, skin: 'lugia' })
     const pokemon5 = new Pokemon({ _id: 5, name: { en: 'Makuhita', fr: 'Makuhita' }, attack: 2, skin: 'makuhita' })
 

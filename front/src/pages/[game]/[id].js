@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faForward, faSync } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
 import { history } from 'helpers/history'
+import useDefaultLang from 'helpers/hooks/useDefaultLang'
 
 /**
  * @typedef {object} ModalInfos 
@@ -45,6 +46,7 @@ export default function IdGame({ gameManager, match, me }) {
     const border = useMemo(() => 2, [])
     const imgSize = useMemo(() => ({ width: 1600, height: 800 }), [])
     const lang = useLang()
+    const defaultLang = useDefaultLang()
 
     const currentPlayer = useMemo(() => game.players?.find(player => player.isYourTurn), [game])
     const mePlayer = useMemo(() => {
@@ -74,7 +76,14 @@ export default function IdGame({ gameManager, match, me }) {
         return { x: 0, y: 0 }
     }, [game, isOffline, me])
     const nextPlayer = useMemo(
-        () => game.players?.find(x => x.position === (currentPlayer?.position < game.players?.length ? currentPlayer?.position + 1 : 1)),
+        () => game.players?.find(x => x.position === (() => {
+            const _getNextPos = (pos = currentPlayer.position) => pos < game.players.length ? pos + 1 : 1
+            let nextPos = _getNextPos()
+            while (game.players.find(x => x.position === nextPos)?.life <= 0) { // eslint-disable-line
+                nextPos = _getNextPos(nextPos > game.players.length ? 1 : nextPos)
+            }
+            return nextPos
+        })()),
         [game, currentPlayer]
     )
 
@@ -272,7 +281,7 @@ export default function IdGame({ gameManager, match, me }) {
                 >
                     <button
                         className={classnames("button is-orange", { 'is-loading': status === Status.PENDING })}
-                        disabled={isOffline ? false : currentPlayer?._id === mePlayer?._id}
+                        disabled={(isOffline ? false : currentPlayer?._id === mePlayer?._id) || game?.status !== 'running'}
                         onClick={async () => {
                             setStatus(Status.PENDING)
                             try {
@@ -300,7 +309,7 @@ export default function IdGame({ gameManager, match, me }) {
                             }
                         }}
                     >
-                        <span>End of turn</span>
+                        <span>{lang('endOfTurn')}</span>
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={faForward} />
                         </span>
@@ -308,25 +317,24 @@ export default function IdGame({ gameManager, match, me }) {
                     <button
                         className={classnames("button is-info", { 'is-loading': status === Status.PENDING })}
                         onClick={() => getGame()}
+                        disabled={game?.status !== 'finished'}
                     >
-                        <span>Refresh</span>
+                        <span>{lang('refresh')}</span>
                         <span className="icon is-small">
                             <FontAwesomeIcon icon={faSync} />
                         </span>
                     </button>
-
                 </div>
                 <div>
-                    <p><b>AP</b>: {mePlayer?.ap ?? 0}</p>&nbsp;/&nbsp;
-                    <p><b>MP</b>: {mePlayer?.mp ?? 0}</p>&nbsp;/&nbsp;
-                    <p><b>Your Pokemon</b>: {mePlayer?.pokemon?.name?.en?.toString() ?? <i>None</i>}</p>
+                    <p><b>{lang('ap')}</b>: {mePlayer?.ap ?? 0}</p>&nbsp;/&nbsp;
+                    <p><b>{lang('mp')}</b>: {mePlayer?.mp ?? 0}</p>&nbsp;/&nbsp;
+                    <p><b>{lang('yourPkmn')}</b>: {mePlayer?.pokemon?.name?.[defaultLang ?? 'en']?.toString() ?? <i>{lang('none')}</i>}</p>
                 </div>
                 <div>
-                    <p><b>Turn</b>: {currentPlayer?.username}</p>
-                    &nbsp;/&nbsp;
-                    <p><b>Next player</b>: {nextPlayer?.username}</p>
+                    <p><b>{lang('turn')}</b>: {currentPlayer?.username}</p>&nbsp;/&nbsp;
+                    <p><b>{lang('nextPlayer')}</b>: {nextPlayer?.username}</p>
                 </div>
-                <p><b>Turn number</b>: {game.turnNumber ?? ''}</p>
+                <p><b>{lang('turnNumber')}</b>: {game.turnNumber ?? ''}</p>
             </div>
         </main>
     )
@@ -359,6 +367,8 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
 
     /** @type {[boolean, function(boolean):any]} Show info */
     const [isShowInfo, setIsShowInfo] = useState(!!false)
+    const lang = useLang()
+    const defaultLang = useDefaultLang()
 
     if (!isDisplayed)
         return <></>
@@ -389,13 +399,13 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                     {(() => {
                         switch (cell?.constructor) {
                             case Pokemon:
-                                return /** @type {Pokemon} **/(cell)?.name?.en ?? <i>Pkmn</i>
+                                return /** @type {Pokemon} **/(cell)?.name?.[defaultLang ?? 'en'] ?? <i>{lang('pkmn')}</i>
                             case Obstacle:
                                 return null
                             case Player:
-                                return /** @type {Player} **/(cell)?.username ?? <i>User</i>
+                                return /** @type {Player} **/(cell)?.username ?? <i>{lang('user')}</i>
                             default:
-                                return <>Move here ?</>
+                                return <>{lang('moveHere')}</>
                         }
                     })()}
                 </p>
@@ -405,12 +415,12 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                             switch (cell?.constructor) {
                                 case Pokemon:
                                     return <p>
-                                        <b>Attack</b>: {/** @type {Pokemon} */(cell)?.attack}
+                                        <b>{lang('attack')}</b>: {/** @type {Pokemon} */(cell)?.attack}
                                     </p>
                                 case Player:
                                     return <p>
-                                        <b>HP</b>: {/** @type {Player} */(cell)?.life}<br />
-                                        <b>Pokemon</b>: {/** @type {Player} */(cell)?.pokemon?.name?.en ?? <i>None</i>}
+                                        <b>{lang('hp')}</b>: {/** @type {Player} */(cell)?.life}<br />
+                                        <b>{lang('pokemon')}</b>: {/** @type {Player} */(cell)?.pokemon?.name?.[defaultLang ?? 'en'] ?? <i>{lang('none')}</i>}
                                     </p>
                                 default:
                                     return <></>
@@ -427,7 +437,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                                 className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
                                                 onClick={() => setIsShowInfo(true)}
                                             >
-                                                Infos
+                                                {lang('infos')}
                                             </button>
                                             <button
                                                 type="button"
@@ -438,7 +448,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                                     onHide()
                                                 }}
                                             >
-                                                Catch
+                                                {lang('catch')}
                                             </button>
                                         </>
                                     case Obstacle:
@@ -450,7 +460,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                                 className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
                                                 onClick={() => setIsShowInfo(true)}
                                             >
-                                                Infos
+                                                {lang('infos')}
                                             </button>
                                             <button
                                                 type="button"
@@ -461,7 +471,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                                     onHide()
                                                 }}
                                             >
-                                                Attack
+                                                {lang('attack')}
                                             </button>
                                         </>
                                     default:
@@ -475,7 +485,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                                     onHide()
                                                 }}
                                             >
-                                                Yes
+                                                {lang('yes')}
                                             </button>
                                         </>
                                 }

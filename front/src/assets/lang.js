@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none'} TranslateKey
  */
 
 /**
@@ -83,11 +83,82 @@ const Translates = {
         fr: 'Partie',
         en: 'Game',
     },
-    code: {
-        fr: 'Code',
-        en: 'Code',
+    endOfTurn: {
+        fr: 'Fin du tour',
+        en: 'End of turn',
+    },
+    refresh: {
+        fr: 'Rafraichir',
+        en: 'Refresh',
+    },
+    ap: {
+        fr: 'PA',
+        en: 'AP',
+    },
+    mp: {
+        fr: 'PM',
+        en: 'MP',
+    },
+    yourPkmn: {
+        fr: 'Ton Pokémon',
+        en: 'Your Pokemon',
+    },
+    turn: {
+        fr: 'Tour',
+        en: 'Turn',
+    },
+    nextPlayer: {
+        fr: 'Joueur suivant',
+        en: 'Next player',
+    },
+    turnNumber: {
+        fr: 'Tour numero',
+        en: 'Turn number',
+    },
+    pkmn: {
+        fr: 'Pkmn',
+        en: 'Pkmn',
+    },
+    user: {
+        fr: 'Utili.',
+        en: 'User',
+    },
+    moveHere: {
+        fr: 'Aller ici ?',
+        en: 'Move here?',
+    },
+    attack: {
+        fr: 'Attaque',
+        en: 'Attack',
+    },
+    hp: {
+        fr: 'Vie',
+        en: 'HP',
+    },
+    pokemon: {
+        fr: 'Pokémon',
+        en: 'Pokemon',
+    },
+    infos: {
+        fr: 'Infos',
+        en: 'Infos',
+    },
+    catch: {
+        fr: 'Attr.',
+        en: 'Catch',
+    },
+    yes: {
+        fr: 'Oui',
+        en: 'Yes',
+    },
+    no: {
+        fr: 'Non',
+        en: 'No',
+    },
+    none: {
+        fr: 'Aucun',
+        en: 'None'
     }
 }
-
 
 export default Translates
