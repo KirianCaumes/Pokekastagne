@@ -156,35 +156,32 @@ export function initNotificationService() {
 
             registration.pushManager
                 .getSubscription()
-                .then(subscription => {
-                    if (subscription === null) {
-                        registration.pushManager
-                            .subscribe({
-                                userVisibleOnly: true,
-                                applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                            })
-                            .then(newSub => {
-                                console.log('fetching')
-                                fetch('/api/subscribe', {
-                                    method: 'POST',
-                                    body: JSON.stringify(newSub),
-                                    headers: {
-                                        'content-type': 'application/json'
-                                    }
-                                }).then(() => {
-                                    console.log('Sent push!')
-                                })
-                            })
-                            .catch(err => {
-                                if (Notification.permission !== 'granted') {
-                                    console.log('Permission was not granted.')
-                                } else {
-                                    console.error('An error ocurred during the subscription process.', err)
+                .then(() => {
+                    registration.pushManager
+                        .subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                        })
+                        .then(newSub => {
+                            console.log('fetching')
+                            fetch('/api/subscribe', {
+                                method: 'POST',
+                                body: JSON.stringify(newSub),
+                                headers: {
+                                    'content-type': 'application/json'
                                 }
+                            }).then(() => {
+                                console.log('Sent push!')
                             })
-                    } else {
-                        console.log('Registered push!')
-                    }
+                        })
+                        .catch(err => {
+                            if (Notification.permission !== 'granted') {
+                                console.log('Permission was not granted.')
+                            } else {
+                                console.error('An error ocurred during the subscription process.', err)
+                            }
+                        })
+
                 })
         })
             .catch(err => {
