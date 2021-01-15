@@ -1,21 +1,27 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
 // @ts-ignore
-import { Section, Columns, Container } from 'react-bulma-components'
+import {Section, Columns, Container} from 'react-bulma-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
-import * as serviceWorkerRegistration from "../serviceWorkerRegistration";
-
+import Modal from "../components/general/modal";
 /**
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
     const lang = useLang()
+    let isDisplayed = true;
 
-    if (this.props.isAuthenticated) {
-        serviceWorkerRegistration.initNotificationService()
+    const clickYes = () => {
+        isDisplayed = false;
+
+        // Install
+    }
+
+    const clickNo = () => {
+        isDisplayed = false;
     }
 
     return (
@@ -25,6 +31,9 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
+           <Modal isDisplay={isDisplayed} title={'Install!'} onClickYes={clickYes} onClickNo={clickNo}>
+
+           </Modal>
             <Section>
                 <Container>
                     <img
@@ -77,6 +86,17 @@ export default function Index({ signOut, me }) {
                                     </span>
                                     <span>{lang('settings')}</span>
                                 </Link>
+                            </Columns.Column>
+                            <Columns.Column>
+                                <button
+                                    className="button is-large is-orange is-fullwidth"
+                                    onClick={() => signOut()}
+                                >
+                                    <span>{lang('logout')}</span>
+                                    <span className="icon is-small">
+                                        <FontAwesomeIcon icon={faSignOutAlt} />
+                                    </span>
+                                </button>
                             </Columns.Column>
                             <Columns.Column>
                                 <button
