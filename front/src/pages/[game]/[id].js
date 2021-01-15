@@ -17,6 +17,7 @@ import { Coord } from 'request/objects/meta/coord'// eslint-disable-line
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faForward, faSync } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
+import { history } from 'helpers/history'
 
 /**
  * @typedef {object} ModalInfos 
@@ -43,48 +44,69 @@ export default function IdGame({ gameManager, match, me }) {
     const size = useMemo(() => 38, [])
     const border = useMemo(() => 2, [])
     const imgSize = useMemo(() => ({ width: 1600, height: 800 }), [])
-
-    const currentPlayer = useMemo(() => game.players?.find(player => player.isYourTurn), [game])
-    const nextPlayer = useMemo(() => game.players?.find(x => x.position === (currentPlayer?.position < game.players?.length ? currentPlayer?.position + 1 : 1)), [game, currentPlayer])
-
     const lang = useLang()
 
-    const getGame = useCallback(async () => {
-        setStatus(Status.PENDING)
-        try {
-            const game = await gameManager.getById(match.params.id, type)
-            setGame(game)
-            setStatus(Status.RESOLVED)
-        } catch (error) {
-            switch (error?.constructor) {
-                case CancelRequestError: break
-                case UnauthorizedError:
-                case InvalidEntityError:
-                    setStatus(Status.REJECTED)
-                    console.error(error)
-                    break
-                // case NotFoundError:
-                //     console.log(error)
-                //     history.goBack()
-                //     break
-                case NotImplementedError:
-                default:
-                    setStatus(Status.REJECTED)
-                    console.error(error)
-                    break
+    const currentPlayer = useMemo(() => game.players?.find(player => player.isYourTurn), [game])
+    const mePlayer = useMemo(() => {
+        if (isOffline)
+            return game.players?.find(player => player.isYourTurn)
+        else
+            return game.players?.find(player => me._id === player?._id)
+    }, [game, isOffline, me])
+    const isYourTurn = useMemo(
+        () => isOffline ? true : currentPlayer?._id === mePlayer?._id,
+        [isOffline, currentPlayer, mePlayer]
+    )
+    const mePlayerPos = useMemo(() => {
+        if (!game?.map)
+            return { x: 0, y: 0 }
+        for (const [y, row] of game?.map?.entries()) {
+            for (const [x, cell] of row?.entries()) {
+                if (isOffline) {
+                    if (cell?.type === 'player' && /** @type {Player} */(cell)?.isYourTurn)
+                        return { x, y }
+                } else {
+                    if (cell?.type === 'player' && me._id === /** @type {Player} */(cell)?._id)
+                        return { x, y }
+                }
             }
         }
-    },
-        [gameManager, type, match]
+        return { x: 0, y: 0 }
+    }, [game, isOffline, me])
+    const nextPlayer = useMemo(
+        () => game.players?.find(x => x.position === (currentPlayer?.position < game.players?.length ? currentPlayer?.position + 1 : 1)),
+        [game, currentPlayer]
     )
 
-    useEffect(() => {
-        (async () => getGame())()
-    }, [getGame])
-
-    useEffect(() => {
-        console.log(game)
-    }, [game])
+    const getGame = useCallback(
+        async () => {
+            setStatus(Status.PENDING)
+            try {
+                const game = await gameManager.getById(match.params.id, type)
+                setGame(game)
+                setStatus(Status.RESOLVED)
+            } catch (error) {
+                switch (error?.constructor) {
+                    case CancelRequestError: break
+                    case UnauthorizedError:
+                    case InvalidEntityError:
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                    case NotFoundError:
+                        console.log(error)
+                        history.goBack()
+                        break
+                    case NotImplementedError:
+                    default:
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                }
+            }
+        },
+        [gameManager, type, match]
+    )
 
     const areas = useMemo(() =>
         game.map?.map((row, y) =>
@@ -123,6 +145,14 @@ export default function IdGame({ gameManager, match, me }) {
         ,
         [game, border, size]
     )
+
+    useEffect(() => {
+        (async () => getGame())()
+    }, [getGame])
+
+    useEffect(() => {
+        console.log(game)
+    }, [game])
 
     return (
         <main
@@ -191,6 +221,9 @@ export default function IdGame({ gameManager, match, me }) {
                     size={size}
                     border={border}
                     status={status}
+                    isYourTurn={isYourTurn}
+                    isCloseEnough={[0, 1].includes(Math.abs(modalInfos.x - mePlayerPos?.x)) && [0, 1].includes(Math.abs(modalInfos.y - mePlayerPos?.y))}
+                    isMe={modalInfos.x === mePlayerPos?.x && modalInfos.y === mePlayerPos?.y}
                     onHide={() => setModalInfos({ isDisplayed: false })}
                     onAction={
                         /**
@@ -211,10 +244,10 @@ export default function IdGame({ gameManager, match, me }) {
                                         setStatus(Status.REJECTED)
                                         console.error(error)
                                         break
-                                    // case NotFoundError:
-                                    //     console.log(error)
-                                    //     history.goBack()
-                                    //     break
+                                    case NotFoundError:
+                                        console.log(error)
+                                        // history.goBack()
+                                        break
                                     case NotImplementedError:
                                     default:
                                         setStatus(Status.REJECTED)
@@ -234,7 +267,7 @@ export default function IdGame({ gameManager, match, me }) {
                 >
                     <button
                         className={classnames("button is-orange", { 'is-loading': status === Status.PENDING })}
-                        disabled={isOffline ? false : me._id !== currentPlayer?._id}
+                        disabled={isOffline ? false : currentPlayer?._id === mePlayer?._id}
                         onClick={async () => {
                             setStatus(Status.PENDING)
                             try {
@@ -249,10 +282,10 @@ export default function IdGame({ gameManager, match, me }) {
                                         setStatus(Status.REJECTED)
                                         console.error(error)
                                         break
-                                    // case NotFoundError:
-                                    //     console.log(error)
-                                    //     history.goBack()
-                                    //     break
+                                    case NotFoundError:
+                                        console.log(error)
+                                        // history.goBack()
+                                        break
                                     case NotImplementedError:
                                     default:
                                         setStatus(Status.REJECTED)
@@ -279,7 +312,7 @@ export default function IdGame({ gameManager, match, me }) {
 
                 </div>
                 <div>
-                    <p><b>Your Pokemon</b>: {(isOffline ? currentPlayer?.pokemon?.name?.en?.toString() : game.players.find(player => player._id === me._id)?.pokemon?.name?.en.toString()) ?? <i>None</i>}</p>
+                    <p><b>Your Pokemon</b>: {mePlayer?.pokemon?.name?.en?.toString() ?? <i>None</i>}</p>
                 </div>
                 <div>
                     <p><b>Turn</b>: {currentPlayer?.username}</p>
@@ -303,8 +336,11 @@ export default function IdGame({ gameManager, match, me }) {
  * @param {function} props.onHide
  * @param {function(Coord, 'walk' | 'attack' | 'catch' | 'skip'):any} props.onAction
  * @param {Status} props.status
+ * @param {boolean} props.isCloseEnough
+ * @param {boolean} props.isYourTurn
+ * @param {boolean} props.isMe
  */
-function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, onHide = () => null, onAction = () => null, status }) {
+function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, onHide = () => null, onAction = () => null, status, isCloseEnough = false, isYourTurn = false, isMe = false }) {
     // @ts-ignore
     _ModalInfos.handleClickOutside = () => isDisplayed ? onHide() : null
 
@@ -339,7 +375,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                             case Pokemon:
                                 return /** @type {Pokemon} **/(cell)?.name?.en ?? <i>Pkmn</i>
                             case Obstacle:
-                                return <i>Obstacle</i>
+                                return null
                             case Player:
                                 return /** @type {Player} **/(cell)?.username ?? <i>User</i>
                             default:
@@ -362,6 +398,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                     <button
                                         type="button"
                                         className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
+                                        disabled={!isYourTurn || !isCloseEnough}
                                         onClick={async () => {
                                             await onAction({ x, y }, 'catch')
                                             onHide()
@@ -386,6 +423,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                     <button
                                         type="button"
                                         className={classnames("button is-danger", { 'is-loading': status === Status.PENDING })}
+                                        disabled={!isYourTurn || !isCloseEnough || isMe}
                                         onClick={() => onHide()} //TODO
                                     >
                                         Attack
@@ -396,6 +434,7 @@ function _ModalInfos({ isDisplayed = false, x = 0, y = 0, cell, size, border, on
                                     <button
                                         type="button"
                                         className={classnames("button is-link", { 'is-loading': status === Status.PENDING })}
+                                        disabled={!isYourTurn}
                                         onClick={async () => {
                                             await onAction({ x, y }, 'walk')
                                             onHide()

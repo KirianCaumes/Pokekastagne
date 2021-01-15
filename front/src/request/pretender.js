@@ -217,11 +217,11 @@ server.patch('/api/game/offline/:id/:action', request => {
 const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
     const myId = (new Date().getUTCMilliseconds() / 2).toString()
 
-    const player1 = new Player({ _id: myId, username: 'Player 1', isYourTurn: true, position: 1, skin: 'biker' })
-    const player2 = new Player({ _id: myId, username: 'Player 2', isYourTurn: false, position: 2, skin: 'cameraman' })
-    const player3 = new Player({ _id: myId, username: 'Player 3', isYourTurn: false, position: 3, skin: 'clown' })
-    const player4 = new Player({ _id: myId, username: 'Player 4', isYourTurn: false, position: 4, skin: 'girl' })
-    const player5 = new Player({ _id: myId, username: 'Player 5', isYourTurn: false, position: 5, skin: 'papy' })
+    const player1 = new Player({ _id: myId, username: 'Biker', isYourTurn: true, position: 1, skin: 'biker' })
+    const player2 = new Player({ _id: myId, username: 'Cameraman', isYourTurn: false, position: 2, skin: 'cameraman' })
+    const player3 = new Player({ _id: myId, username: 'Clown', isYourTurn: false, position: 3, skin: 'clown' })
+    const player4 = new Player({ _id: myId, username: 'Girl', isYourTurn: false, position: 4, skin: 'girl' })
+    const player5 = new Player({ _id: myId, username: 'Papy', isYourTurn: false, position: 5, skin: 'papy' })
 
     const pokemon1 = new Pokemon({ _id: 1, name: { en: 'Artikodin', fr: 'Artikodin' }, attack: 5, skin: 'artikodin' })
     const pokemon2 = new Pokemon({ _id: 2, name: { en: 'Bulbizarre', fr: 'Bulbizarre' }, attack: 1, skin: 'bulbizarre' })
