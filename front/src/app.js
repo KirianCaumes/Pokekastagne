@@ -17,6 +17,7 @@ import { init, signIn, signOut } from 'redux/slices/user'// eslint-disable-line
 import { UserState, PayloadInit, PayloadSingIn } from 'redux/slices/user'// eslint-disable-line
 import { PrivateRoute, PublicRoute } from 'components/routes'
 import IdGame from 'pages/[game]/[id]'
+import {initNotificationService} from "./serviceWorkerRegistration";
 
 /**
  * Global components props
@@ -68,6 +69,7 @@ function _App({ userManager, isAuthenticated, init }) {
         () => {
             (async () => {
                 if (isAuthenticated) {
+                    initNotificationService()
                     try {
                         const me = await userManager.getMe()
                         init({ me })

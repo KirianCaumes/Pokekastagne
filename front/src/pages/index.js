@@ -11,20 +11,9 @@ import Modal from "../components/general/modal";
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
+    /** @type {[boolean, function(boolean):any]} Modal */
+    const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
     const lang = useLang()
-    let isDisplayed = true;
-
-
-
-    const clickYes = () => {
-        isDisplayed = false;
-
-        // Install
-    }
-
-    const clickNo = () => {
-        isDisplayed = false;
-    }
 
     return (
         <main
@@ -33,8 +22,12 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
-           <Modal isDisplay={isDisplayed} title={'Install!'} onClickYes={clickYes} onClickNo={clickNo}>
-
+           <Modal
+               isDisplay={isModalDisplayed}
+               title={'Install!'}
+               onClickYes={() => setIsModalDisplayed(true)}
+               onClickNo={() => setIsModalDisplayed(false)}
+           >
            </Modal>
             <Section>
                 <Container>
