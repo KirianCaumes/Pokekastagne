@@ -262,6 +262,40 @@ export default function IdGame({ gameManager, match, me }) {
                             }
                         }}
                 />
+            {/* Awaiting screen */}
+            {game?.status === 'await' && 
+            <div className="wait-screen">
+                <p className="top1">#1</p>
+                <p className="victory">{lang('victory')}</p>
+                <p className="royale">{lang('royale')}</p>      
+            </div> 
+            }
+            {/* Winning screen */}
+            {game?.status === 'finished' && mePlayer?._id === game.players.find(player => player?.life > 0) && 
+            <div className="win-screen">
+                <p className="top1">#1</p>
+                <p className="victory">{lang('victory')}</p>
+                <p className="royale">{lang('royale')}</p>      
+            </div> 
+            }
+            {/* Losing screen */}
+            {/* {mePlayer?.life < 0 &&  */}
+            <div className="lose-screen">
+                <div>
+                    <p className="defeat">{lang('defeat')}</p>  
+                    <button
+                        className={classnames("button is-info")}
+                        onClick={() => history.push('/singleplayer')}
+                    >
+                        <span>{lang('backToMenu')}</span>
+                        <span className="icon is-small">
+                            <FontAwesomeIcon icon={faSync} />
+                        </span>
+                    </button>
+                </div>
+                
+            </div> 
+            {/* } */}
             </div>
             <div
                 style={{ width: imgSize.width }}

@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'victory' | 'royale' | 'defeat' | 'backToMenu'} TranslateKey
  */
 
 /**
@@ -86,6 +86,24 @@ const Translates = {
     code: {
         fr: 'Code',
         en: 'Code',
+    },
+    victory : {
+        fr: 'Victoire',
+        en: 'Victory'
+    }
+    ,
+    royale : {
+        fr: 'Royale',
+        en: 'Royale'
+    },
+    defeat : {
+        fr: 'Vous avez été vaincu !',
+        en: 'You have been defeated!'
+    }
+    ,
+    backToMenu : {
+        fr: 'Retour au menu principal',
+        en: 'Back to menu'
     }
 }
 

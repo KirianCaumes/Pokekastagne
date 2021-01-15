@@ -1,4 +1,5 @@
 @import "../../helpers.scss";
+@import "../../variables.scss";
 
 $min-width: 1600px;
 
@@ -41,6 +42,78 @@ main.app-page-game-id {
         }
       }
     }
+    .win-screen {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba($color: #000000, $alpha: .80);
+      z-index: 10;
+
+      p {
+        position: absolute;
+        font-weight: bold;
+        color: $yellow;
+      }
+      .top1 {
+        font-size: 400px;
+        top: 97.5px;
+        left: 220px;
+      }
+      .victory {
+        font-size: 180px;
+        top: 190px;
+        left: 675px;
+      }
+      .royale{
+        font-size: 180px;
+        top: 360px;
+        left: 815px;
+      }
+    }
+    .lose-screen {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba($color: #000000, $alpha: .80);
+      z-index: 10;
+
+      p {
+        text-align: center;
+        font-weight: bold;
+        color: #E89090;
+        font-size: 100px;
+      }
+      div {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      button {
+        background-color: #803A3A;
+        display: block;
+      }
+    }
+    .wait-screen {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba($color: #000000, $alpha: .80);
+      z-index: 10;
+
+      p {
+        position: absolute;
+        font-weight: bold;
+        color: $yellow;
+      }
+    }
   }
   .info-bar {
     margin: 4px auto 0;
@@ -65,4 +138,5 @@ main.app-page-game-id {
       margin-top: 0.4em;
     }
   }
+  
 }
