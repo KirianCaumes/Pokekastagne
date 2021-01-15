@@ -163,8 +163,20 @@ server.patch('/api/game/offline/:id/:action', request => {
             game.players[currentPlayerIndex] = currentPlayer
             break
         case 'attack':
-            //TODO
+
+
+            currentPlayer.ap -= 1 ;
+            //Update hp of attacked enemy
+
+            game.map[body.y][body.x].life -= currentPlayer.pokemon.attack
+
+            if ( game.map[body.y][body.x].life <= 0) {
+
+                game.playersAlive -= 1
+            }
+
             break
+
         case 'catch':
             //Check if pkmn
             if (game.map[body.y][body.x]?.type !== 'pokemon')
