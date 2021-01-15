@@ -17,7 +17,7 @@ export default function Index({ signOut, me }) {
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
 
-    if (navigator.standalone) {
+    if (isStandalone) {
         setIsModalDisplayed(false)
     }
     const lang = useLang()
