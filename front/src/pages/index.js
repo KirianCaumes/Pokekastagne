@@ -14,6 +14,8 @@ export default function Index({ signOut, me }) {
     const lang = useLang()
     let isDisplayed = true;
 
+
+
     const clickYes = () => {
         isDisplayed = false;
 
