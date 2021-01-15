@@ -93,17 +93,6 @@ export default function Index({ signOut, me }) {
                                     </span>
                                 </button>
                             </Columns.Column>
-                            <Columns.Column>
-                                <button
-                                    className="button is-large is-orange is-fullwidth"
-                                    onClick={() => signOut()}
-                                >
-                                    <span>{lang('logout')}</span>
-                                    <span className="icon is-small">
-                                        <FontAwesomeIcon icon={faSignOutAlt} />
-                                    </span>
-                                </button>
-                            </Columns.Column>
                         </Columns>
                     </div>
                 </Container>

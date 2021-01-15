@@ -143,6 +143,7 @@ function urlBase64ToUint8Array(base64String) {
 
 export function initNotificationService() {
     const VAPID_PUBLIC_KEY = 'BAzQNNztn_Klst3iiBCLdxxf3hS0KhdSDMuupon0mpcx4NwQ8Gv_2DwC7en0w_sadNyaRRxfqNl1mmyOxP9FBQE'
+    const LOCAL_STORAGE_KEY = 'POKEKASTAGNE_TOKEN'
 
     if ('serviceWorker' in navigator) {
         console.log('Registering push')
@@ -165,7 +166,8 @@ export function initNotificationService() {
                         method: 'POST',
                         body: JSON.stringify(newSub),
                         headers: {
-                            'content-type': 'application/json'
+                            'content-type': 'application/json',
+                            'authorization': `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEY)}`
                         }
                     }).then(() => {
                         console.log('Sent push!')
