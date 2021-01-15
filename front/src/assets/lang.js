@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none' | 'victory' | 'royale' | 'defeat' | 'backToMenu'} TranslateKey
  */
 
 /**
@@ -158,6 +158,28 @@ const Translates = {
     none: {
         fr: 'Aucun',
         en: 'None'
+    },
+    code: {
+        fr: 'Code',
+        en: 'Code',
+    },
+    victory: {
+        fr: 'Victoire',
+        en: 'Victory'
+    }
+    ,
+    royale: {
+        fr: 'Royale',
+        en: 'Royale'
+    },
+    defeat: {
+        fr: 'Vous avez été vaincu !',
+        en: 'You have been defeated!'
+    }
+    ,
+    backToMenu: {
+        fr: 'Retour au menu principal',
+        en: 'Back to menu'
     }
 }
 
