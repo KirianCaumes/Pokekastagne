@@ -95,8 +95,9 @@ export default function IndexGame({ match, me, gameManager }) {
         async () => {
             setStatus(Status.PENDING)
             try {
-                const game = await gameManager.updateById(null, newGame.gameId, type)
-                history.push(`${match.url}/${game.gameId}`)
+                console.log(newGame.gameId)
+                await gameManager.updateById(null, newGame.gameId, type)
+                history.push(`${match.url}/${newGame.gameId}`)
                 // setGames([game, ...games])
                 // setStatus(Status.RESOLVED)
                 // setNewGame(new Game())

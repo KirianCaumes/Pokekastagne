@@ -10,46 +10,33 @@ import { GameConstants } from "../data/constants/game.constants";
 
 const gameRoutes = Router();
 
-
 gameRoutes.route('/:mode')
     .get((req, res) => {
-        const { mode = "online" } = req.params;
-        const token = req.headers.authorization.split(' ')[1];
-        const userFromToken = getUserFromToken(token);
+        const { mode = GameConstants.ONLINE } = req.params;
+        const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
         // Misspelled mode handling
-        if (!['online', 'offline'].includes(mode)) {
-            res.status(400).send('Syntax error, check your request url.');
-            return;
-        }
+        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(mode))
+            return res.status(400).send('Syntax error, check your request url.');
 
         GameModel
-            .find({ status: { $in: ['await', 'running'] }, gameMode: mode, players: { $elemMatch: { email: userFromToken.email } } })
+            .find({ status: { $in: [GameConstants.STATUS_AWAIT, GameConstants.STATUS_RUNNING] }, gameMode: mode, players: { $elemMatch: { email: userFromToken.email } } })
             .sort({ startDate: -1 })
             .exec()
-            .then(games => {
-                res.send({
-                    game: games
-                });
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
-            });
+            .then(games => res.send({ game: games }))
+            .catch(err => res.status(500).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) }));
     })
     .post((req, res) => {
         const { name } = req.body;
-        const { mode = "online" } = req.params;
-        let generatedCode = '';
+        const { mode = GameConstants.ONLINE } = req.params;
 
         // Assert that the generatedCode is unique in the database
         GameModel.find({}).exec()
             .then(async games => {
                 const alreadyUsedCodes = games.map(item => item.gameId);
-                generatedCode = generateCode(alreadyUsedCodes);
+                const generatedCode = generateCode(alreadyUsedCodes);
 
-                const token = req.headers.authorization.split(' ')[1];
-                const userFromToken = getUserFromToken(token);
+                const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
                 const me = {
                     _id: userFromToken.id,
@@ -62,16 +49,6 @@ gameRoutes.route('/:mode')
                     position: 1
                 }
 
-                const map = await MapModelModel.find({}).exec()
-                    .then(maps => {
-                        return maps[Math.floor(Math.random() * maps.length)]?.map
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        res.status(500).send('Error fetching the mapModel.');
-                    })
-
-
                 // Create the game
                 GameModel.create({
                     name,
@@ -80,27 +57,18 @@ gameRoutes.route('/:mode')
                     players: [
                         me
                     ],
-                    playersAlive: 1, // TODO changer ça / mais je sais plus pourquoi mdr
+                    playersAlive: 1,
                     turnNumber: 1,
                     startDate: new Date(),
-                    map: getNewMap([me], [], map),
+                    map: [[]],
                     status: "await",
-                    gameMode: mode
+                    gameMode: mode,
+                    pngImg: 1
                 })
-                    .then(game => {
-                        res.send({
-                            game: game
-                        });
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        res.status(500).send('Could not create the game.');
-                    });
+                    .then(game => res.send({ game: game }))
+                    .catch(err => res.status(500).send({ error: 'Could not create the game.', stacktrace: JSON.stringify(err) }));
             })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('Could not create the game id, aborting.');
-            });
+            .catch(err => res.status(500).send({ error: 'Could not create the game id, aborting.', stacktrace: JSON.stringify(err) }));
     });
 
 gameRoutes.route('/:mode/:id')
@@ -111,44 +79,32 @@ gameRoutes.route('/:mode/:id')
             .then(game => {
                 if (!game)
                     throw 'Not found'
-                res.send({
-                    game
-                });
+
+                res.send({ game });
             })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('Could not fetch the game.');
-            });
+            .catch(err => res.status(500).send({ error: 'Could not fetch the game.', stacktrace: JSON.stringify(err) }));
     })
     .put((req, res) => {
-        const gameMode = req.params.mode;
-        const gameId = req.params.id;
-        const token = req.headers.authorization.split(' ')[1];
-        const userFromToken = getUserFromToken(token);
+        const { mode, id } = req.params
+        const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
-        if (!['online', 'offline'].includes(gameMode)) {
-            res.status(400).send('Syntax error, check your request url.');
-            return;
-        }
+        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(mode))
+            return res.status(400).send('Syntax error, check your request url.');
 
-        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).exec()
+        GameModel.findOne({ gameId: id, gameMode: mode }).exec()
             .then(game => {
-                if (game === null) {
-                    res.status(404).send('Cannot find your game! Check your game code.');
-                    return;
+                if (!!game) {
+                    return res.status(404).send('Cannot find your game! Check your game code.');
                 } else if (game.players.length === 5) {
-                    res.send('The lobby is already full!');
-                    return;
+                    return res.status(400).send('The lobby is already full!');
                 } else if (game.status === 'running') {
-                    res.send('The game already started!');
-                    return;
+                    return res.status(400).send('The game already started!');
                 } else if (game.status === 'finished') {
-                    res.send('The game is already finished.');
-                    return;
+                    return res.status(400).send('The game is already finished.');
                 }
-                if (game.players.map(p => p._id).includes(userFromToken.id)) {
-                    res.send('You already are in this game!');
-                }
+
+                if (game.players.map(p => p._id).includes(userFromToken.id))
+                    return res.status(400).send('You already are in this game!');
 
                 game.players.push({
                     _id: userFromToken.id,
@@ -161,81 +117,63 @@ gameRoutes.route('/:mode/:id')
                     isYourTurn: false,
                     position: game.players.length + 1
                 });
+
                 game.playersAlive++;
 
                 if (game.playersAlive === 5) {
                     // Start the game
-                    game.status = 'running';
+                    game.status = GameConstants.STATUS_RUNNING;
 
                     game.players.forEach(player => {
-                        player.lastActionDate = Date.now();
+                        player.lastActionDate = new Date();
                     });
 
                     PokemonModel.find({}).exec()
                         .then(pokemon => {
-                            if (pokemon.length < 5) {
-                                res.status(404).send('Not enough pokemon! Aborting.');
-                                return;
-                            }
+                            if (pokemon.length < 5)
+                                return res.status(404).send('Not enough pokemon! Aborting.');
 
                             game.players = shuffleArray(game.players);
-                            for (let i = 0; i < game.players.length; i++) {
+
+                            for (let i = 0; i < game.players.length; i++)
                                 game.players[i].position = i + 1;
-                            }
 
                             // Init map
-                            const shuffled = shuffleArray(pokemon)
+                            const shuffledPkmn = shuffleArray(pokemon)
 
                             MapModelModel.find({}).exec()
                                 .then(mapModels => {
                                     const chosenModel = mapModels[Math.floor(Math.random() * mapModels.length)];
 
-                                    game.map = getNewMap(game.players, shuffled, chosenModel.map);
+                                    game.map = getNewMap(game.players, shuffledPkmn, chosenModel.map);
                                     game.pngImg = chosenModel.pngImg;
 
                                     game.save();
 
-                                    res.send({
-                                        game: game
-                                    });
+                                    return res.send({ game: game });
                                 })
                                 .catch(err => {
                                     console.error(err);
                                     res.status(500).send('Error fetching the mapModel.');
                                 });
-                        }).catch(err => {
-                            console.error(err);
-                            res.status(500).send('Error fetching pokemon.');
-                        });
+                        })
+                        .catch(err => res.status(500).send({ error: 'Error fetching pokemon.', stacktrace: JSON.stringify(err) }));
                 } else {
                     game.save();
 
-                    res.send({
-                        game: game
-                    });
+                    return res.send({ game: game });
                 }
 
             })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send('Could not create the game.');
-            });
+            .catch(err => res.status(500).send({ error: 'Could not create the game.', stacktrace: JSON.stringify(err) }));
     })
     .delete((req, res) => {
-        const gameId = req.params.id;
+        const { mode, id } = req.params
+        const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
-        const token = req.headers.authorization.split(' ')[1];
-        const userFromToken = getUserFromToken(token);
-
-        GameModel.findOneAndDelete({ creatorId: userFromToken.id, gameId: gameId }).exec()
-            .then(deletedGame => {
-                res.send('Successfully deleted!');
-            })
-            .catch(err => {
-                // TODO handle 404 errors? and not allowed to delete errors?
-                console.error(err);
-                res.status(500).send('internal server error.');
-            });
+        GameModel.findOneAndDelete({ creatorId: userFromToken.id, gameId: id }).exec()
+            .then(() => res.send('Successfully deleted!'))
+            .catch(err => res.status(500).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) }));
     });
 
 gameRoutes.route('/:mode/:id/:move')
@@ -248,7 +186,7 @@ gameRoutes.route('/:mode/:id/:move')
             yCoord: req.body.y
         };
 
-        if (!['online', 'offline'].includes(gameMode)) {
+        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode)) {
             res.status(400).send('Syntax error for the mode, check your request url.');
             return;
         }
