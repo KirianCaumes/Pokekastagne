@@ -52,7 +52,7 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
                     case NotImplementedError:
                     default:
                         setStatus(Status.REJECTED)
-                        setErrorMessage(error?.message || 'Something bad happend 🤷‍♀️')
+                        setErrorMessage(error?.message || 'Something bad happened 🤷‍♀️')
                         console.error(error)
                         break
                 }
@@ -62,10 +62,9 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
     )
 
     useEffect(() => {
-        if (isAuthenticated) {
-            initNotificationService()
+        if (isAuthenticated)
             history.push('/')
-        }
+
     }, [isAuthenticated])
 
     return (
