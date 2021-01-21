@@ -297,7 +297,7 @@ gameRoutes.route('/:mode/:id/:move')
                                     UserModel.findOne({_id: game.players[i]._id}).exec()
                                         .then(user => {
                                             webpush.sendNotification(user.subscription, {
-                                                title: 'A TOI DE JOUER BONHOMME' // TODO implement better
+                                                title: 'It\'s your turn my bonhomme!' // TODO implement better
                                             }).catch(err => {
                                                 console.error(err.stack);
                                             });
@@ -316,6 +316,14 @@ gameRoutes.route('/:mode/:id/:move')
 
                 if (game.playersAlive === 1) {
                     game.status = 'finished';
+                    UserModel.findOne({_id: game.players.filter(p => p.life > 0)._id}).exec()
+                        .then(user => {
+                            webpush.sendNotification(user.subscription, {
+                                title: 'You won the victory royale my bonhomme!'
+                            }).catch(err => {
+                                console.error(err.stack);
+                            });
+                        });
                     // currentPlayer won mais on sait pas qui
                 }
 

@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none' | 'victory' | 'royale' | 'defeat' | 'backToMenu'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none' | 'victory' | 'royale' | 'defeat' | 'backToMenu' | 'install'} TranslateKey
  */
 
 /**
@@ -180,6 +180,10 @@ const Translates = {
     backToMenu: {
         fr: 'Retour au menu principal',
         en: 'Back to menu'
+    },
+    install: {
+        fr: 'Installer l\'app !',
+        en: 'Install the app!',
     }
 }
 

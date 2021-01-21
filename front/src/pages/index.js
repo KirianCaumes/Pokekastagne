@@ -7,12 +7,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import Modal from "../components/general/modal";
+import usePWA from "react-pwa-install-prompt";
 /**
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
+    const { isStandalone, isInstallPromptSupported, promptInstall } = usePWA()
+
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
+
+    useEffect(() => {
+        if (isStandalone) {
+            setIsModalDisplayed(false)
+        }
+    }, [isStandalone, setIsModalDisplayed])
+
     const lang = useLang()
 
     return (
@@ -24,8 +34,13 @@ export default function Index({ signOut, me }) {
         >
            <Modal
                isDisplay={isModalDisplayed}
-               title={'Install!'}
-               onClickYes={() => setIsModalDisplayed(true)}
+               title={lang('install')}
+               onClickYes={async () =>  {
+                   const didInstall = await promptInstall()
+                   if (didInstall) {
+                       console.log('Installe vite')
+                   }
+               }}
                onClickNo={() => setIsModalDisplayed(false)}
            >
            </Modal>
@@ -81,17 +96,6 @@ export default function Index({ signOut, me }) {
                                     </span>
                                     <span>{lang('settings')}</span>
                                 </Link>
-                            </Columns.Column>
-                            <Columns.Column>
-                                <button
-                                    className="button is-large is-orange is-fullwidth"
-                                    onClick={() => signOut()}
-                                >
-                                    <span>{lang('logout')}</span>
-                                    <span className="icon is-small">
-                                        <FontAwesomeIcon icon={faSignOutAlt} />
-                                    </span>
-                                </button>
                             </Columns.Column>
                             <Columns.Column>
                                 <button
