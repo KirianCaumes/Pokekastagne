@@ -50,7 +50,7 @@ const map = [[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, 
 /** @type {Game[]} */
 let games = []
 
-const FORCE_ID = 123 //⚠⚠ FORCE ID FOR ALL GAMES IN DEV
+const FORCE_ID = process.env.NODE_ENV === 'development' ? 123 : undefined //⚠⚠ FORCE ID FOR ALL GAMES IN DEV
 
 
 server.get('/api/game/offline', (request) => {
