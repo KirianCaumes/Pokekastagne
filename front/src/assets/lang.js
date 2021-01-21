@@ -73,7 +73,7 @@ const Translates = {
     },
     noResult: {
         fr: 'Aucun résultat',
-        en: 'No result found',
+        en: 'No game found',
     },
     name: {
         fr: 'Nom',

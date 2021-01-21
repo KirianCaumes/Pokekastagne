@@ -13,18 +13,18 @@ const gameRoutes = Router();
 
 gameRoutes.route('/:mode')
     .get((req, res) => {
-        const { gameMode = "online" } = req.body;
+        const { mode = "online" } = req.params;
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
         // Misspelled mode handling
-        if (!['online', 'offline'].includes(gameMode)) {
+        if (!['online', 'offline'].includes(mode)) {
             res.status(400).send('Syntax error, check your request url.');
             return;
         }
 
         GameModel
-            .find({ status: { $in: ['await', 'running'] }, gameMode, players: { $elemMatch: { email: userFromToken.email } } })
+            .find({ status: { $in: ['await', 'running'] }, gameMode: mode, players: { $elemMatch: { email: userFromToken.email } } })
             .sort({ startDate: -1 })
             .exec()
             .then(games => {
@@ -38,7 +38,8 @@ gameRoutes.route('/:mode')
             });
     })
     .post((req, res) => {
-        const { name, gameMode = "online" } = req.body;
+        const { name } = req.body;
+        const { mode = "online" } = req.params;
         let generatedCode = '';
 
         // Assert that the generatedCode is unique in the database
@@ -84,7 +85,7 @@ gameRoutes.route('/:mode')
                     startDate: new Date(),
                     map: getNewMap([me], [], map),
                     status: "await",
-                    gameMode: gameMode
+                    gameMode: mode
                 })
                     .then(game => {
                         res.send({
@@ -104,15 +105,15 @@ gameRoutes.route('/:mode')
 
 gameRoutes.route('/:mode/:id')
     .get((req, res) => {
-        const gameMode = req.params.mode;
-        const gameId = req.params.id;
+        const { mode, id } = req.params
 
-        GameModel.findOne({ gameMode: gameMode, gameId: gameId }).exec()
+        GameModel.findOne({ gameMode: mode, gameId: id }).exec()
             .then(game => {
+                if (!game)
+                    throw 'Not found'
                 res.send({
-                    game: game
+                    game
                 });
-
             })
             .catch(err => {
                 console.error(err);
