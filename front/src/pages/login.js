@@ -15,8 +15,7 @@ import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { NotImplementedError } from 'request/errors/notImplementedError'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
-import * as serviceWorkerRegistration from "../serviceWorkerRegistration";
-import {initNotificationService} from "../serviceWorkerRegistration";
+import { initNotificationService } from "../serviceWorkerRegistration"
 
 /**
  * @param {AppProps} props

@@ -1,27 +1,21 @@
-import React, {useEffect, useState} from 'react'
+import React, { useState } from 'react'
 import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
 // @ts-ignore
-import {Section, Columns, Container} from 'react-bulma-components'
+import { Section, Columns, Container, Notification, Button } from 'react-bulma-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs, faDownload } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
-import Modal from "../components/general/modal";
-import usePWA from "react-pwa-install-prompt";
+import usePWA from 'react-pwa-install-prompt'
+
 /**
  * @param {AppProps} props
  */
 export default function Index({ signOut, me }) {
-    const { isStandalone, isInstallPromptSupported, promptInstall } = usePWA()
-
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
 
-    useEffect(() => {
-        if (isStandalone) {
-            setIsModalDisplayed(false)
-        }
-    }, [isStandalone, setIsModalDisplayed])
+    const { isStandalone, isInstallPromptSupported, promptInstall } = usePWA()
 
     const lang = useLang()
 
@@ -32,18 +26,35 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
-           <Modal
-               isDisplay={isModalDisplayed}
-               title={lang('install')}
-               onClickYes={async () =>  {
-                   const didInstall = await promptInstall()
-                   if (didInstall) {
-                       console.log('Installe vite')
-                   }
-               }}
-               onClickNo={() => setIsModalDisplayed(false)}
-           >
-           </Modal>
+            {isModalDisplayed && isInstallPromptSupported && !isStandalone &&
+                <Notification
+                    className="is-navyblue"
+                >
+                    <button
+                        className="button is-orange"
+                        type="button"
+                        onClick={async () => {
+                            const didInstall = await promptInstall()
+                            if (didInstall)
+                                console.log("Success")
+                            setIsModalDisplayed(false)
+                        }}
+                    >
+                        <span>{lang('installApp')}</span>
+                        <span className="icon is-small">
+                            <FontAwesomeIcon icon={faDownload} />
+                        </span>
+                    </button>
+                    <Button
+                        remove
+                        onClick={() => {
+                            setIsModalDisplayed(false)
+                        }}
+                    />
+                </Notification>
+            }
+
+
             <Section>
                 <Container>
                     <img
