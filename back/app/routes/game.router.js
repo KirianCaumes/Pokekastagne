@@ -1,19 +1,19 @@
-import {Router} from 'express';
-import {GameModel} from "../data/models/Game.js";
-import {PokemonModel} from "../data/models/Pokemon.js";
-import {generateCode, getNewMap, shuffleArray, searchAndUpdatePlayerCoords, summonPokemon} from "../utils/game.utils.js";
-import {getUserFromToken} from "../security/auth.js";
-import {MapModelModel} from "../data/models/MapModel";
+import { Router } from 'express';
+import { GameModel } from "../data/models/Game.js";
+import { PokemonModel } from "../data/models/Pokemon.js";
+import { generateCode, getNewMap, shuffleArray, searchAndUpdatePlayerCoords, summonPokemon } from "../utils/game.utils.js";
+import { getUserFromToken } from "../security/auth.js";
+import { MapModelModel } from "../data/models/MapModel";
 import webpush from "web-push";
-import {UserModel} from "../data/models/User";
-import {GameConstants} from "../data/constants/game.constants";
+import { UserModel } from "../data/models/User";
+import { GameConstants } from "../data/constants/game.constants";
 
 const gameRoutes = Router();
 
 
 gameRoutes.route('/:mode')
     .get((req, res) => {
-        const gameMode = req.params.mode;
+        const { gameMode = "online" } = req.body;
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
@@ -23,12 +23,13 @@ gameRoutes.route('/:mode')
             return;
         }
 
-        // TODO try to filter in the query
-        GameModel.find({status: {$in: ['await', 'running']}, mode: gameMode}).exec()
+        GameModel
+            .find({ status: { $in: ['await', 'running'] }, gameMode, players: { $elemMatch: { email: userFromToken.email } } })
+            .sort({ startDate: -1 })
+            .exec()
             .then(games => {
-                const userGames = games.players.find(player => player.user?.email === userFromToken.email);
                 res.send({
-                    games: userGames
+                    game: games
                 });
             })
             .catch(err => {
@@ -37,37 +38,51 @@ gameRoutes.route('/:mode')
             });
     })
     .post((req, res) => {
-        const gameMode = req.params.mode;
+        const { name, gameMode = "online" } = req.body;
         let generatedCode = '';
 
         // Assert that the generatedCode is unique in the database
         GameModel.find({}).exec()
-            .then(games => {
+            .then(async games => {
                 const alreadyUsedCodes = games.map(item => item.gameId);
                 generatedCode = generateCode(alreadyUsedCodes);
 
                 const token = req.headers.authorization.split(' ')[1];
                 const userFromToken = getUserFromToken(token);
 
+                const me = {
+                    _id: userFromToken.id,
+                    email: userFromToken.email,
+                    username: userFromToken.username,
+                    skin: userFromToken.skin,
+                    pokemon: null,
+                    life: process.env.START_LIFE,
+                    isYourTurn: false,
+                    position: 1
+                }
+
+                const map = await MapModelModel.find({}).exec()
+                    .then(maps => {
+                        return maps[Math.floor(Math.random() * maps.length)]?.map
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        res.status(500).send('Error fetching the mapModel.');
+                    })
+
+
                 // Create the game
                 GameModel.create({
-                    creatorId: userFromToken.id,
+                    name,
+                    creatorId: userFromToken._id,
                     gameId: generatedCode,
                     players: [
-                        {
-                            _id: userFromToken.id,
-                            username: userFromToken.username,
-                            skin: userFromToken.skin,
-                            pokemon: null,
-                            life: process.env.START_LIFE,
-                            isYourTurn: false,
-                            position: 1
-                        }
+                        me
                     ],
                     playersAlive: 1, // TODO changer ça / mais je sais plus pourquoi mdr
                     turnNumber: 1,
                     startDate: new Date(),
-                    map: [[]],
+                    map: getNewMap([me], [], map),
                     status: "await",
                     gameMode: gameMode
                 })
@@ -92,7 +107,7 @@ gameRoutes.route('/:mode/:id')
         const gameMode = req.params.mode;
         const gameId = req.params.id;
 
-        GameModel.findOne({gameMode: gameMode, gameId: gameId}).exec()
+        GameModel.findOne({ gameMode: gameMode, gameId: gameId }).exec()
             .then(game => {
                 res.send({
                     game: game
@@ -115,7 +130,7 @@ gameRoutes.route('/:mode/:id')
             return;
         }
 
-        GameModel.findOne({gameId: gameId, gameMode: gameMode}).exec()
+        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).exec()
             .then(game => {
                 if (game === null) {
                     res.status(404).send('Cannot find your game! Check your game code.');
@@ -141,7 +156,7 @@ gameRoutes.route('/:mode/:id')
                     pokemon: null,
                     ap: GameConstants.DEFAULT_AP,
                     mp: GameConstants.DEFAULT_MP,
-                    life:  GameConstants.DEFAULT_START_LIFE,
+                    life: GameConstants.DEFAULT_START_LIFE,
                     isYourTurn: false,
                     position: game.players.length + 1
                 });
@@ -211,7 +226,7 @@ gameRoutes.route('/:mode/:id')
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
-        GameModel.findOneAndDelete({creatorId: userFromToken.id, gameId: gameId}).exec()
+        GameModel.findOneAndDelete({ creatorId: userFromToken.id, gameId: gameId }).exec()
             .then(deletedGame => {
                 res.send('Successfully deleted!');
             })
@@ -241,7 +256,7 @@ gameRoutes.route('/:mode/:id/:move')
             return;
         }
 
-        GameModel.findOne({gameId: gameId, mode: gameMode}).exec()
+        GameModel.findOne({ gameId: gameId, mode: gameMode }).exec()
             .then(game => {
                 let currentPlayer = game.players.find(player => player.isYourTurn);
 
@@ -294,11 +309,11 @@ gameRoutes.route('/:mode/:id/:move')
                                 if (game.players[i].life > 0) {
                                     game.players[i].isYourTurn = true;
 
-                                    UserModel.findOne({_id: game.players[i]._id}).exec()
+                                    UserModel.findOne({ _id: game.players[i]._id }).exec()
                                         .then(user => {
-                                            webpush.sendNotification(user.subscription, {
+                                            webpush.sendNotification(user.subscription, JSON.stringify({
                                                 title: 'A TOI DE JOUER BONHOMME' // TODO implement better
-                                            }).catch(err => {
+                                            })).catch(err => {
                                                 console.error(err.stack);
                                             });
                                         });
@@ -337,4 +352,4 @@ gameRoutes.route('/:mode/:id/:move')
             });
     });
 
-export {gameRoutes};
+export { gameRoutes };

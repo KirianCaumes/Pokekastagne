@@ -38,7 +38,10 @@ html {
         display: block;
         margin: 0 auto;
         width: 745px;
-        height: auto;
+        height: 188px;
+        @include until($tablet) {
+          height: auto;
+        }
       }
       .main-content {
         display: flex;

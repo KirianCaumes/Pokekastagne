@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
-import {PokemonSchema} from "./Pokemon.js";
+import { PokemonSchema } from "./Pokemon.js";
 
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 export const PlayerSchema = new Schema({
     _id: Number,
     username: String,
+    email: String,
     skin: String,
     pokemon: PokemonSchema,
     life: Number,

@@ -1,5 +1,3 @@
-import {map} from "../data/maps.js";
-
 function generateCode(alreadyUsedCodes) {
     let result = '';
     let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -21,11 +19,14 @@ function getRandomInt(max) {
 }
 
 function addPokemon(map, pokemon) {
-    const xLength = map[0].length;
+    const xLength = map[0]?.length;
     const yLength = map.length;
 
+    if (!xLength || !yLength)
+        return map
+
     let i = 0;
-    while (i < 5) {
+    while (i < pokemon?.length) {
         let xCoord = getRandomInt(xLength);
         let yCoord = getRandomInt(yLength);
 
@@ -43,8 +44,11 @@ function addPokemon(map, pokemon) {
 }
 
 function initPlayerPositions(map, players) {
-    const xLength = map[0].length;
+    const xLength = map[0]?.length;
     const yLength = map.length;
+
+    if (!xLength || !yLength)
+        return map
 
     let i = 0;
 
@@ -116,7 +120,7 @@ function searchAndUpdatePlayerCoords(map, player) {
 }
 
 function shuffleArray(arr) {
-    for(let i = arr.length - 1; i > 0; i--){
+    for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * i)
         const temp = arr[i]
         arr[i] = arr[j]
@@ -127,4 +131,4 @@ function shuffleArray(arr) {
 }
 
 
-export {generateCode, getNewMap, summonPokemon, searchAndUpdatePlayerCoords, shuffleArray};
+export { generateCode, getNewMap, summonPokemon, searchAndUpdatePlayerCoords, shuffleArray };

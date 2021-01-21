@@ -35,9 +35,9 @@ export default function Index({ signOut, me }) {
                         type="button"
                         onClick={async () => {
                             const didInstall = await promptInstall()
-                            if (didInstall)
-                                console.log("Success")
-                            setIsModalDisplayed(false)
+                            if (didInstall) {
+                                setIsModalDisplayed(false)
+                            }
                         }}
                     >
                         <span>{lang('installApp')}</span>
@@ -107,17 +107,6 @@ export default function Index({ signOut, me }) {
                                     </span>
                                     <span>{lang('settings')}</span>
                                 </Link>
-                            </Columns.Column>
-                            <Columns.Column>
-                                <button
-                                    className="button is-large is-orange is-fullwidth"
-                                    onClick={() => signOut()}
-                                >
-                                    <span>{lang('logout')}</span>
-                                    <span className="icon is-small">
-                                        <FontAwesomeIcon icon={faSignOutAlt} />
-                                    </span>
-                                </button>
                             </Columns.Column>
                             <Columns.Column>
                                 <button

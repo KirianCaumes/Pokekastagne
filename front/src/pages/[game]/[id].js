@@ -78,7 +78,7 @@ export default function IdGame({ gameManager, match, me }) {
     }, [game, isOffline, me])
     const nextPlayer = useMemo(
         () => game.players?.find(x => x.position === (() => {
-            const _getNextPos = (pos = currentPlayer.position) => pos < game.players.length ? pos + 1 : 1
+            const _getNextPos = (pos = currentPlayer?.position) => pos < game.players.length ? pos + 1 : 1
             let nextPos = _getNextPos()
             while (game.players.find(x => x.position === nextPos)?.life <= 0) { // eslint-disable-line
                 nextPos = _getNextPos(nextPos > game.players.length ? 1 : nextPos)
@@ -141,7 +141,7 @@ export default function IdGame({ gameManager, match, me }) {
                         case Player:
                             return "rgba(233,212,96,0.4)"
                         default:
-                            return Math.abs(x - mePlayerPos.x) + Math.abs(y - mePlayerPos.y) <= mePlayer.mp ? 'rgba(255,255,255,0.4)' : 'rgba(207,0,15,0.8)'
+                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp ? 'rgba(255,255,255,0.4)' : 'rgba(207,0,15,0.8)'
                     }
                 })(),
                 props: {
@@ -275,9 +275,10 @@ export default function IdGame({ gameManager, match, me }) {
                 {/* Awaiting screen */}
                 {game?.status === 'await' &&
                     <div className="wait-screen">
-                        <p className="top1">#1</p>
+                        Please wait...
+                        {/* <p className="top1">#1</p>
                         <p className="victory">{lang('victory')}</p>
-                        <p className="royale">{lang('royale')}</p>
+                        <p className="royale">{lang('royale')}</p> */}
                     </div>
                 }
                 {/* Winning screen */}
@@ -289,7 +290,7 @@ export default function IdGame({ gameManager, match, me }) {
                     </div>
                 }
                 {/* Losing screen */}
-                {mePlayer?.life < 0 &&
+                {mePlayer && mePlayer?.life < 0 &&
                     <div className="lose-screen">
                         <div>
                             <p className="defeat">{lang('defeat')}</p>

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 function login(user) {
     return jwt.sign(
         {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             username: user.username,
             skin: user.skin
@@ -33,12 +33,15 @@ function authenticate(req, res, next) {
 }
 
 function getUserFromToken(token) {
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+    /** @type {any} */
+    const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
-        return {
-            email: decoded.email,
-            username: decoded.username
-        }
+    return {
+        _id: decoded._id,
+        email: decoded.email,
+        username: decoded.username,
+        skin: decoded.skin
+    }
 }
 
 export { login, authenticate, getUserFromToken };
