@@ -56,7 +56,7 @@ gameRoutes.route('/:mode')
                     username: userFromToken.username,
                     skin: userFromToken.skin,
                     pokemon: null,
-                    life: process.env.START_LIFE,
+                    life: GameConstants.DEFAULT_START_LIFE,
                     isYourTurn: false,
                     position: 1
                 }

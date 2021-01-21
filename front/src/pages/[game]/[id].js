@@ -296,15 +296,15 @@ export default function IdGame({ gameManager, match, me }) {
                     <div className="lose-screen">
                         <div>
                             <p className="defeat">{lang('defeat')}</p>
-                            <button
-                                className={classnames("button is-orange")}
-                                onClick={() => history.push('/singleplayer')}
+                            <Link
+                                className="button is-orange"
+                                to={isOffline ? '/singleplayer' : '/multiplayer'}
                             >
+                                <span>{lang('backToMenu')}</span>
                                 <span className="icon is-small">
                                     <FontAwesomeIcon icon={faBackward} />
                                 </span>
-                                <span>{lang('backToMenu')}</span>
-                            </button>
+                            </Link>
                         </div>
 
                     </div>
@@ -319,7 +319,7 @@ export default function IdGame({ gameManager, match, me }) {
                 >
                     <Link
                         className="button is-blue"
-                        to="/singleplayer"
+                        to={isOffline ? '/singleplayer' : '/multiplayer'}
                     >
                         <span>{lang('backToMenu')}</span>
                         <span className="icon is-small">
@@ -364,7 +364,7 @@ export default function IdGame({ gameManager, match, me }) {
                     <button
                         className={classnames("button is-info", { 'is-loading': status === Status.PENDING })}
                         onClick={() => getGame()}
-                        disabled={game?.status !== 'finished'}
+                        disabled={game?.status === 'finished'}
                     >
                         <span>{lang('refresh')}</span>
                         <span className="icon is-small">
