@@ -63,7 +63,11 @@ self.addEventListener('push', ev => {
     console.log('Got push', data)
     // @ts-ignore
     self.registration.showNotification(data.title, {
-        body: 'Hello, World!',
+        body: data.title,
         icon: 'http://mongoosejs.com/docs/images/mongoose5_62x30_transparent.png'
     })
+})
+
+window.addEventListener("appinstalled", event => {
+    fireTracking("PWA app installed by user!!! Hurray");
 })

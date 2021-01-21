@@ -142,53 +142,43 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export function initNotificationService() {
-    console.log('Registering push')
+    const VAPID_PUBLIC_KEY = 'BAzQNNztn_Klst3iiBCLdxxf3hS0KhdSDMuupon0mpcx4NwQ8Gv_2DwC7en0w_sadNyaRRxfqNl1mmyOxP9FBQE'
+
     if ('serviceWorker' in navigator) {
         console.log('Registering push')
-        navigator.serviceWorker.ready.then(function (registration) {
+        navigator.serviceWorker.ready
+            .then(function (registration) {
             console.log('Registering push')
             if (!registration.pushManager) {
                 console.warn('Push manager unavailable.')
                 return
             }
 
-            console.log('hello ' + JSON.stringify(registration))
-
             registration.pushManager
-                .getSubscription()
-                .then(subscription => {
-                    if (subscription === null) {
-                        registration.pushManager
-                            .subscribe({
-                                userVisibleOnly: true,
-                                applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY)
-                            })
-                            .then(newSub => {
-                                fetch('/api/subscribe', {
-                                    method: 'POST',
-                                    body: JSON.stringify(newSub),
-                                    headers: {
-                                        'content-type': 'application/json'
-                                    }
-                                }).then(() => {
-                                    console.log('Sent push!')
-                                })
-                            })
-                            .catch(err => {
-                                if (Notification.permission !== 'granted') {
-                                    console.log('Permission was not granted.')
-                                } else {
-                                    console.error('An error ocurred during the subscription process.', err)
-                                }
-                            })
+                .subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                })
+                .then(newSub => {
+                    console.log('fetching')
+                    fetch('/api/user/subscribe', {
+                        method: 'POST',
+                        body: JSON.stringify(newSub),
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    }).then(() => {
+                        console.log('Sent push!')
+                    })
+                })
+                .catch(err => {
+                    if (Notification.permission !== 'granted') {
+                        console.log('Permission was not granted.')
                     } else {
-                        console.log('Registered push!')
+                        console.error('An error ocurred during the subscription process.', err)
                     }
                 })
         })
-            .catch(err => {
-                console.error(JSON.stringify(err))
-            })
     }
 }
 
