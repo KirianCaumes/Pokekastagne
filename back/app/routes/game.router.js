@@ -20,7 +20,7 @@ gameRoutes.route('/:mode')
             return res.status(400).send('Syntax error, check your request url.');
 
         GameModel
-            .find({ status: { $in: [GameConstants.STATUS_AWAIT, GameConstants.STATUS_RUNNING] }, gameMode: mode, players: { $elemMatch: { email: userFromToken.email } } })
+            .find({ status: { $in: [GameConstants.STATUS_AWAIT, GameConstants.STATUS_RUNNING] }, gameMode: mode, players: { $elemMatch: { _id: userFromToken._id } } })
             .sort({ startDate: -1 })
             .exec()
             .then(games => res.send({ game: games }))
@@ -39,7 +39,7 @@ gameRoutes.route('/:mode')
                 const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
                 const me = {
-                    _id: userFromToken.id,
+                    _id: userFromToken._id,
                     email: userFromToken.email,
                     username: userFromToken.username,
                     skin: userFromToken.skin,
@@ -93,7 +93,7 @@ gameRoutes.route('/:mode/:id')
 
         GameModel.findOne({ gameId: id, gameMode: mode }).exec()
             .then(game => {
-                if (!!game) {
+                if (!game) {
                     return res.status(404).send('Cannot find your game! Check your game code.');
                 } else if (game.players.length === 5) {
                     return res.status(400).send('The lobby is already full!');
@@ -107,20 +107,19 @@ gameRoutes.route('/:mode/:id')
                     return res.status(400).send('You already are in this game!');
 
                 game.players.push({
-                    _id: userFromToken.id,
+                    _id: userFromToken._id,
+                    email: userFromToken.email,
                     username: userFromToken.username,
                     skin: userFromToken.skin,
                     pokemon: null,
-                    ap: GameConstants.DEFAULT_AP,
-                    mp: GameConstants.DEFAULT_MP,
                     life: GameConstants.DEFAULT_START_LIFE,
                     isYourTurn: false,
-                    position: game.players.length + 1
+                    position: 1
                 });
 
                 game.playersAlive++;
 
-                if (game.playersAlive === 5) {
+                if (game.players?.length >= GameConstants.MAX_PLAYERS) {
                     // Start the game
                     game.status = GameConstants.STATUS_RUNNING;
 
