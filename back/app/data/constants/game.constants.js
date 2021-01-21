@@ -7,4 +7,6 @@ export const GameConstants = {
     STATUS_AWAIT: 'await',
     STATUS_RUNNING: 'running',
     STATUS_FINISHED: 'finished',
+
+    MAX_PLAYERS: 2
 }

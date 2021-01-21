@@ -4,7 +4,7 @@ import { PokemonSchema } from "./Pokemon.js";
 const { Schema } = mongoose;
 
 export const PlayerSchema = new Schema({
-    _id: Number,
+    _id: Schema.Types.ObjectId,
     username: String,
     email: String,
     skin: String,
