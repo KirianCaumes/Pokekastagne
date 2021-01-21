@@ -39,6 +39,7 @@ gameRoutes.route('/:mode')
                 const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
                 const me = {
+                    type: 'player',
                     _id: userFromToken._id,
                     email: userFromToken.email,
                     username: userFromToken.username,
@@ -109,6 +110,7 @@ gameRoutes.route('/:mode/:id')
                     return res.status(400).send('You already are in this game!');
 
                 game.players.push({
+                    type: 'player',
                     _id: userFromToken._id,
                     email: userFromToken.email,
                     username: userFromToken.username,
@@ -200,7 +202,7 @@ gameRoutes.route('/:mode/:id/:move')
             return;
         }
 
-        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).exec()
+        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).lean().exec()
             .then(async game => {
                 const currentPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
@@ -211,7 +213,7 @@ gameRoutes.route('/:mode/:id/:move')
                     }
                     throw new Error('Player current not found')
                 })()
-                const currentPlayer = { ...game.map[currentPlayerPos.y][currentPlayerPos.x] }
+                const currentPlayer = {...game.map[currentPlayerPos.y][currentPlayerPos.x], type: 'player' }
                 const currentPlayerIndex = game.players.findIndex(x => x._id.toString() === currentPlayer._id.toString()) //Based on uniq username for test
 
                 const nextPosition = (() => {
@@ -223,17 +225,28 @@ gameRoutes.route('/:mode/:id/:move')
                     return nextPos
                 })()
 
-                const nextPlayer = game.players.find(x => x.position === nextPosition)
+                console.log('currentPlayerPos', currentPlayerPos)
+                console.log('currentPlayer', currentPlayer)
+                console.log('currentPlayerIndex', currentPlayerIndex)
+                console.log('nextPosition', nextPosition)
+
+                const nextPlayer = {...game.players.find(x => x.position === nextPosition), type: 'player' }
                 const nextPlayerIndex = game.players.findIndex(x => x.position === nextPosition)
+                console.log('bonjour ', nextPlayer)
+
                 const nextPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
                         for (const [x, cell] of row.entries()) {
-                            if (cell?.type === 'player' && /** @type {Player} */(cell)?.username === nextPlayer.username)
+                            if (cell?.type === 'player' && /** @type {Player} */(cell)?._id.toString() === nextPlayer._id.toString())
                                 return { x, y }
                         }
                     }
                     throw new Error('Player next not found')
                 })()
+
+                console.log('nextPlayer', nextPlayer)
+                console.log('nextPlayerIndex', nextPlayerIndex)
+                console.log('nextPlayerPos', nextPlayerPos)
 
                 switch (move) {
                     case 'walk':
@@ -245,7 +258,7 @@ gameRoutes.route('/:mode/:id/:move')
 
                         currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
 
-                        if (currentPlayer.mp <= 0) //Not enough mp
+                        if (currentPlayer.mp < 0) //Not enough mp
                             break
 
                         console.log(currentPlayer)
@@ -332,7 +345,9 @@ gameRoutes.route('/:mode/:id/:move')
 
                         //Update pos new player
                         game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer
+                        console.log('nextPlayer', nextPlayer)
                         game.players[nextPlayerIndex] = nextPlayer
+                        console.log('game', JSON.stringify(game))
 
                         if (nextPosition === 1)
                             game.turnNumber += 1

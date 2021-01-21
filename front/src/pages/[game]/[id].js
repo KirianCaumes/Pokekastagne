@@ -328,7 +328,7 @@ export default function IdGame({ gameManager, match, me }) {
                     </Link>
                     <button
                         className={classnames("button is-orange", { 'is-loading': status === Status.PENDING })}
-                        disabled={(isOffline ? false : currentPlayer?._id === mePlayer?._id) || game?.status !== 'running'}
+                        disabled={(isOffline ? false : currentPlayer?._id !== mePlayer?._id) || game?.status !== 'running'}
                         onClick={async () => {
                             setStatus(Status.PENDING)
                             try {

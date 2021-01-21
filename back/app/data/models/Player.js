@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 export const PlayerSchema = new Schema({
     _id: Schema.Types.ObjectId,
+    type: String,
     username: String,
     email: String,
     skin: String,
