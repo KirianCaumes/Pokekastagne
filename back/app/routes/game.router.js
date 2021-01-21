@@ -39,6 +39,7 @@ gameRoutes.route('/:mode')
                 const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
                 const me = {
+                    type: 'player',
                     _id: userFromToken._id,
                     email: userFromToken.email,
                     username: userFromToken.username,
@@ -109,6 +110,7 @@ gameRoutes.route('/:mode/:id')
                     return res.status(400).send('You already are in this game!');
 
                 game.players.push({
+                    type: 'player',
                     _id: userFromToken._id,
                     email: userFromToken.email,
                     username: userFromToken.username,
@@ -205,7 +207,7 @@ gameRoutes.route('/:mode/:id/:move')
                 const currentPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
                         for (const [x, cell] of row.entries()) {
-                            if (cell?.type === 'player' && /** @type {Player} */(cell)?.isYourTurn)
+                            if (cell?.type === 'player' && (cell)?.isYourTurn)
                                 return { x, y }
                         }
                     }
@@ -228,7 +230,7 @@ gameRoutes.route('/:mode/:id/:move')
                 const nextPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
                         for (const [x, cell] of row.entries()) {
-                            if (cell?.type === 'player' && /** @type {Player} */(cell)?.username === nextPlayer.username)
+                            if (cell?.type === 'player' && (cell)?.username === nextPlayer.username)
                                 return { x, y }
                         }
                     }
@@ -269,7 +271,7 @@ gameRoutes.route('/:mode/:id/:move')
                         currentPlayer.ap -= 1
 
                         //Get target player
-                        const targetPlayer = /** @type {Player} */(game.map[body.y][body.x])
+                        const targetPlayer = (game.map[body.y][body.x])
                         const targetPlayerIndex = game.players.findIndex(x => x.username === targetPlayer.username) //Based on uniq username for test
 
                         //Update target player
@@ -313,7 +315,7 @@ gameRoutes.route('/:mode/:id/:move')
                         game.map[currentPlayerPos.y][currentPlayerPos.x] = null
 
                         //Update new player
-                        currentPlayer.pokemon = /** @type {Pokemon} */(game.map[body.y][body.x])
+                        currentPlayer.pokemon = (game.map[body.y][body.x])
                         game.map[body.y][body.x] = currentPlayer
                         game.players[currentPlayerIndex] = currentPlayer
                         break
