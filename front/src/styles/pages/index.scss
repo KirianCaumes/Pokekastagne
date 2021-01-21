@@ -2,4 +2,20 @@ main.app-page-index {
     .main-content {
         justify-content: space-evenly;
     }
+    .notification {
+        box-shadow: 0 8px 8px rgba(10, 10, 10, 0.1);
+        position: fixed;
+        z-index: 999;
+        bottom: 1em;
+        right: 1em;
+        // width: 350px;
+        max-width: 75%;
+        .content {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+    }
 }

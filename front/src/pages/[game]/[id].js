@@ -19,6 +19,7 @@ import { faBackward, faForward, faSync } from '@fortawesome/free-solid-svg-icons
 import classnames from 'classnames'
 import { history } from 'helpers/history'
 import useDefaultLang from 'helpers/hooks/useDefaultLang'
+import { Link } from 'react-router-dom'
 
 /**
  * @typedef {object} ModalInfos 
@@ -288,23 +289,23 @@ export default function IdGame({ gameManager, match, me }) {
                     </div>
                 }
                 {/* Losing screen */}
-                {/* {mePlayer?.life < 0 &&  */}
-                <div className="lose-screen">
-                    <div>
-                        <p className="defeat">{lang('defeat')}</p>
-                        <button
-                            className={classnames("button is-orange")}
-                            onClick={() => history.push('/singleplayer')}
-                        >
-                            <span className="icon is-small">
-                                <FontAwesomeIcon icon={faBackward} />
-                            </span>
-                            <span>{lang('backToMenu')}</span>
-                        </button>
-                    </div>
+                {mePlayer?.life < 0 &&
+                    <div className="lose-screen">
+                        <div>
+                            <p className="defeat">{lang('defeat')}</p>
+                            <button
+                                className={classnames("button is-orange")}
+                                onClick={() => history.push('/singleplayer')}
+                            >
+                                <span className="icon is-small">
+                                    <FontAwesomeIcon icon={faBackward} />
+                                </span>
+                                <span>{lang('backToMenu')}</span>
+                            </button>
+                        </div>
 
-                </div>
-                {/* } */}
+                    </div>
+                }
             </div>
             <div
                 style={{ width: imgSize.width }}
@@ -313,6 +314,15 @@ export default function IdGame({ gameManager, match, me }) {
                 <div
                     className="buttons"
                 >
+                    <Link
+                        className="button is-blue"
+                        to="/singleplayer"
+                    >
+                        <span>{lang('backToMenu')}</span>
+                        <span className="icon is-small">
+                            <FontAwesomeIcon icon={faBackward} />
+                        </span>
+                    </Link>
                     <button
                         className={classnames("button is-orange", { 'is-loading': status === Status.PENDING })}
                         disabled={(isOffline ? false : currentPlayer?._id === mePlayer?._id) || game?.status !== 'running'}
