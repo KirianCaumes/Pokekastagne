@@ -275,10 +275,12 @@ export default function IdGame({ gameManager, match, me }) {
                 {/* Awaiting screen */}
                 {game?.status === 'await' &&
                     <div className="wait-screen">
-                        Please wait...
-                        {/* <p className="top1">#1</p>
-                        <p className="victory">{lang('victory')}</p>
-                        <p className="royale">{lang('royale')}</p> */}
+                        <div>
+                            <p>{lang('waiting')}</p>
+                            <p>{game.players?.length}/5</p>
+                            <p>{lang('roomCode')}</p>
+                            <p>{game?.gameId}</p>
+                        </div>
                     </div>
                 }
                 {/* Winning screen */}
@@ -290,7 +292,7 @@ export default function IdGame({ gameManager, match, me }) {
                     </div>
                 }
                 {/* Losing screen */}
-                {mePlayer && mePlayer?.life < 0 &&
+                {mePlayer?.life < 0 &&
                     <div className="lose-screen">
                         <div>
                             <p className="defeat">{lang('defeat')}</p>
