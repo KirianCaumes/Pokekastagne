@@ -33,8 +33,7 @@ function addPokemon(map, pokemon) {
         if (map[yCoord][xCoord] === null) {
             map[yCoord][xCoord] = {
                 type: 'pokemon',
-                name: pokemon[i].name,
-                attack: pokemon[i].attack
+                ...pokemon[i]
             }
             i++;
         }
@@ -59,13 +58,7 @@ function initPlayerPositions(map, players) {
         if (map[yCoord][xCoord] === null) {
             map[yCoord][xCoord] = {
                 type: 'player',
-                _id: players[i]._id,
-                username: players[i].username,
-                skin: players[i].skin,
-                pokemon: null,
-                life: players[i].life,
-                isYourTurn: players[i].isYourTurn,
-                position: players[i].position
+                ...players[i]
             }
             i++;
         }
@@ -95,8 +88,7 @@ function summonPokemon(map, pokemon) {
     if (map[yCoord][xCoord] === null) {
         map[yCoord][xCoord] = {
             type: 'pokemon',
-            name: pokemon.name,
-            attack: pokemon.attack
+            ...pokemon
         }
     } else {
         // TODO pas sûr de la manoeuvre
@@ -105,18 +97,16 @@ function summonPokemon(map, pokemon) {
     return map;
 }
 
-function searchAndUpdatePlayerCoords(map, player) {
-    for (let i = 0; i < map.length; i++) {
-        for (let j = 0; j < map[i].length; j++) {
-            if (map[i][j].type === 'player') {
-                if (map[i][j]._id === player._id) {
-                    map[i][j] = null;
+function findPlayerCoords(map, player) {
+    for (const [y, row] of map.entries()) {
+        for (const [x, cell] of row.entries()) {
+            if (cell?.type === 'player') {
+                if (cell._id.toString() === player._id.toString()) {
+                    return {x, y};
                 }
             }
         }
     }
-
-    return map;
 }
 
 function shuffleArray(arr) {
@@ -131,4 +121,4 @@ function shuffleArray(arr) {
 }
 
 
-export { generateCode, getNewMap, summonPokemon, searchAndUpdatePlayerCoords, shuffleArray };
+export {generateCode, getNewMap, summonPokemon, findPlayerCoords, shuffleArray};

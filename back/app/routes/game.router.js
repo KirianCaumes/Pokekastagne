@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { GameModel } from "../data/models/Game.js";
 import { PokemonModel } from "../data/models/Pokemon.js";
-import { generateCode, getNewMap, shuffleArray, searchAndUpdatePlayerCoords, summonPokemon } from "../utils/game.utils.js";
+import { generateCode, getNewMap, shuffleArray, findPlayerCoords, summonPokemon } from "../utils/game.utils.js";
 import { getUserFromToken } from "../security/auth.js";
 import { MapModelModel } from "../data/models/MapModel";
 import webpush from "web-push";
@@ -45,6 +45,8 @@ gameRoutes.route('/:mode')
                     skin: userFromToken.skin,
                     pokemon: null,
                     life: GameConstants.DEFAULT_START_LIFE,
+                    ap: GameConstants.DEFAULT_AP,
+                    mp: GameConstants.DEFAULT_MP,
                     isYourTurn: false,
                     position: 1
                 }
@@ -113,6 +115,8 @@ gameRoutes.route('/:mode/:id')
                     skin: userFromToken.skin,
                     pokemon: null,
                     life: GameConstants.DEFAULT_START_LIFE,
+                    ap: GameConstants.DEFAULT_AP,
+                    mp: GameConstants.DEFAULT_MP,
                     isYourTurn: false,
                     position: 1
                 });
@@ -136,6 +140,8 @@ gameRoutes.route('/:mode/:id')
 
                             for (let i = 0; i < game.players.length; i++)
                                 game.players[i].position = i + 1;
+
+                            game.players[0].isYourTurn = true;
 
                             // Init map
                             const shuffledPkmn = shuffleArray(pokemon)
@@ -180,9 +186,9 @@ gameRoutes.route('/:mode/:id/:move')
         const gameMode = req.params.mode;
         const move = req.params.move;
         const gameId = req.params.id;
-        const destCoords = {
-            xCoord: req.body.x,
-            yCoord: req.body.y
+        const body = {
+            x: req.body.x,
+            y: req.body.y
         };
 
         if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode)) {
@@ -194,90 +200,148 @@ gameRoutes.route('/:mode/:id/:move')
             return;
         }
 
-        GameModel.findOne({ gameId: gameId, mode: gameMode }).exec()
-            .then(game => {
-                let currentPlayer = game.players.find(player => player.isYourTurn);
-
-                if ((Date.now() - currentPlayer.lastActionDate) / (1000 * 3600 * 24) > 1) {
-                    // Too late
-                    currentPlayer.life = 0;
-                    game.playersAlive -= 1;
-
-                    res.send('Your last move was more than 24h ago, disqualified!');
-                } else {
-                    switch (move) {
-                        case 'walk':
-                            game.map = searchAndUpdatePlayerCoords(game.map, currentPlayer);
-
-                            game.map[destCoords.yCoord][destCoords.xCoord] = {
-                                type: 'player',
-                                ...currentPlayer
-                            };
-
-                            break;
-                        case 'attack':
-                            const attackedPlayer = game.map[destCoords.yCoord][destCoords.xCoord];
-
-                            attackedPlayer.life -= currentPlayer.pokemon.attack;
-
-                            // If the player is DEAD
-                            if (attackedPlayer.life < 0) {
-                                attackedPlayer.life = 0;
-                                game.playersAlive -= 1;
-                            }
-
-                            break;
-                        case 'catch':
-                            const caughtPokemon = game.map[destCoords.yCoord][destCoords.xCoord];
-                            game.map[destCoords.yCoord][destCoords.xCoord] = null;
-
-                            if (currentPlayer.pokemon !== null) {
-                                // Set the old pokemon randomly on the map
-                                game.map = summonPokemon(game.map, currentPlayer.pokemon);
-                            }
-                            currentPlayer.pokemon = caughtPokemon;
-
-                            break;
-                        case 'skip':
-                            // end of turn
-                            const currentPlayerIndex = game.players.indexOf(currentPlayer);
-                            currentPlayer.isYourTurn = false;
-
-                            for (let i = currentPlayerIndex + 1; i < 100; i++) {
-                                if (game.players[i].life > 0) {
-                                    game.players[i].isYourTurn = true;
-
-                                    UserModel.findOne({ _id: game.players[i]._id }).exec()
-                                        .then(user => {
-                                            webpush.sendNotification(user.subscription, JSON.stringify({
-                                                title: 'A TOI DE JOUER BONHOMME' // TODO implement better
-                                            })).catch(err => {
-                                                console.error(err.stack);
-                                            });
-                                        });
-
-                                    break;
-                                }
-                                if (i + 1 === game.players.length) {
-                                    i = 0;
-                                }
-                            }
-
-                            break;
+        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).exec()
+            .then(async game => {
+                const currentPlayerPos = (() => {
+                    for (const [y, row] of game.map.entries()) {
+                        for (const [x, cell] of row.entries()) {
+                            if (cell?.type === 'player' && /** @type {Player} */(cell)?.isYourTurn)
+                                return { x, y }
+                        }
                     }
+                    throw new Error('Player current not found')
+                })()
+                const currentPlayer = { ...game.map[currentPlayerPos.y][currentPlayerPos.x] }
+                const currentPlayerIndex = game.players.findIndex(x => x._id.toString() === currentPlayer._id.toString()) //Based on uniq username for test
+
+                const nextPosition = (() => {
+                    const _getNextPos = (pos = currentPlayer.position) => pos < game.players.length ? pos + 1 : 1
+                    let nextPos = _getNextPos()
+                    while (game.players.find(x => x.position === nextPos)?.life <= 0) { // eslint-disable-line
+                        nextPos = _getNextPos(nextPos > game.players.length ? 1 : nextPos)
+                    }
+                    return nextPos
+                })()
+
+                const nextPlayer = game.players.find(x => x.position === nextPosition)
+                const nextPlayerIndex = game.players.findIndex(x => x.position === nextPosition)
+                const nextPlayerPos = (() => {
+                    for (const [y, row] of game.map.entries()) {
+                        for (const [x, cell] of row.entries()) {
+                            if (cell?.type === 'player' && /** @type {Player} */(cell)?.username === nextPlayer.username)
+                                return { x, y }
+                        }
+                    }
+                    throw new Error('Player next not found')
+                })()
+
+                switch (move) {
+                    case 'walk':
+                        //Check if pkmn
+                        if (game.map[body.y][body.x]?.type === null) //Not an empty cell
+                            break
+
+                        console.log(currentPlayer)
+
+                        currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
+
+                        if (currentPlayer.mp <= 0) //Not enough mp
+                            break
+
+                        console.log(currentPlayer)
+
+
+                        //Clear current player cell
+                        game.map[currentPlayerPos.y][currentPlayerPos.x] = null
+
+                        //Update new player
+                        game.map[body.y][body.x] = currentPlayer
+                        game.players[currentPlayerIndex] = currentPlayer
+                        break
+                    case 'attack':
+                        if (currentPlayer.ap <= 0) //No ap
+                            break
+
+                        if (!currentPlayer.pokemon) //No pkmn
+                            break
+
+                        //Update hp of attacked enemy
+                        currentPlayer.ap -= 1
+
+                        //Get target player
+                        const targetPlayer = /** @type {Player} */(game.map[body.y][body.x])
+                        const targetPlayerIndex = game.players.findIndex(x => x.username === targetPlayer.username) //Based on uniq username for test
+
+                        //Update target player
+                        targetPlayer.life -= currentPlayer.pokemon?.attack
+
+                        if (targetPlayer.life <= 0)
+                            game.playersAlive -= 1
+
+                        //Update target player
+                        game.map[body.y][body.x] = targetPlayer.life > 0 ? targetPlayer : null
+                        game.players[targetPlayerIndex] = targetPlayer
+
+                        //Update current player
+                        game.map[currentPlayerPos.y][currentPlayerPos.x] = currentPlayer
+                        game.players[currentPlayerIndex] = currentPlayer
+
+                        game.status = game.playersAlive <= 1 ? 'finished' : 'running'
+                        break
+                    case 'catch':
+                        //Check if pkmn
+                        if (game.map[body.y][body.x]?.type !== 'pokemon') //Not a pokemon
+                            break
+
+                        currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
+
+                        if (currentPlayer.mp < 0) //Not enough mp
+                            break
+
+                        //If has pkmn, put in randomly on map
+                        if (!!currentPlayer.pokemon) {
+                            let y = -1
+                            let x = -1
+                            while (y < 0 || x < 0 || !game.map[y] || game.map[y][x] !== null) {
+                                y = Math.floor(Math.random() * (game.map?.length - 0 + 1) + 0)
+                                x = Math.floor(Math.random() * (game.map?.[0]?.length - 0 + 1) + 0)
+                            }
+                            game.map[y][x] = currentPlayer.pokemon
+                        }
+
+                        //Clear current player cell
+                        game.map[currentPlayerPos.y][currentPlayerPos.x] = null
+
+                        //Update new player
+                        currentPlayer.pokemon = /** @type {Pokemon} */(game.map[body.y][body.x])
+                        game.map[body.y][body.x] = currentPlayer
+                        game.players[currentPlayerIndex] = currentPlayer
+                        break
+                    case 'skip':
+                        //Update player
+                        currentPlayer.isYourTurn = false
+                        currentPlayer.ap = 1
+                        currentPlayer.mp = 3
+
+                        //Update new player
+                        game.map[currentPlayerPos.y][currentPlayerPos.x] = currentPlayer
+                        game.players[currentPlayerIndex] = currentPlayer
+
+                        //Set next player turn is done
+                        nextPlayer.isYourTurn = true
+
+                        //Update pos new player
+                        game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer
+                        game.players[nextPlayerIndex] = nextPlayer
+
+                        if (nextPosition === 1)
+                            game.turnNumber += 1
+                        break
+                    default:
+                        break
                 }
 
-                if (game.playersAlive === 1) {
-                    game.status = 'finished';
-                    // currentPlayer won mais on sait pas qui
-                }
-
-                // Increment turn
-                if (game.players.map(p => p.life > 0).indexOf(currentPlayer) === game.players.map(p => p.life > 0).length - 1) {
-                    game.turnNumber += 1;
-                }
-
-                game.save();
+                await GameModel.findOneAndUpdate({ gameId: game.gameId }, game).exec();
 
                 res.send({
                     game: game

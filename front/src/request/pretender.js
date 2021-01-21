@@ -166,7 +166,7 @@ server.patch('/api/game/offline/:id/:action', request => {
 
             currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
 
-            if (currentPlayer.mp < 0) //Not enough mp
+            if (currentPlayer.mp <= 0) //Not enough mp
                 break
 
             //Clear current player cell
