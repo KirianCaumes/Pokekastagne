@@ -1,3 +1,5 @@
+import {GameConstants} from "../data/constants/game.constants";
+
 function generateCode(alreadyUsedCodes) {
     let result = '';
     let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -33,7 +35,9 @@ function addPokemon(map, pokemon) {
         if (map[yCoord][xCoord] === null) {
             map[yCoord][xCoord] = {
                 type: 'pokemon',
-                ...pokemon[i]
+                name: pokemon[i].name,
+                attack: pokemon[i].attack,
+                skin: pokemon[i].skin
             }
             i++;
         }
@@ -58,7 +62,15 @@ function initPlayerPositions(map, players) {
         if (map[yCoord][xCoord] === null) {
             map[yCoord][xCoord] = {
                 type: 'player',
-                ...players[i]
+                _id: players[i]._id,
+                username: players[i].username,
+                skin: players[i].skin,
+                pokemon: null,
+                life: players[i].life,
+                ap: GameConstants.DEFAULT_AP,
+                mp: GameConstants.DEFAULT_MP,
+                isYourTurn: players[i].isYourTurn,
+                position: players[i].position
             }
             i++;
         }
@@ -88,7 +100,9 @@ function summonPokemon(map, pokemon) {
     if (map[yCoord][xCoord] === null) {
         map[yCoord][xCoord] = {
             type: 'pokemon',
-            ...pokemon
+            name: pokemon.name,
+            attack: pokemon.attack,
+            skin: pokemon.skin
         }
     } else {
         // TODO pas sûr de la manoeuvre
