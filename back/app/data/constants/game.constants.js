@@ -9,7 +9,7 @@ export const GameConstants = {
     STATUS_FINISHED: 'finished',
 
     MAX_PLAYERS: process.env.MAX_PLAYERS || 2,
-    SKIP_TIME: 30, // in minutes
+    SKIP_TIME: 1440, // in minutes
 
     ACTIONS_WALK: 'walk',
     ACTIONS_ATTACK: 'attack',
