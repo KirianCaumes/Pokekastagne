@@ -70,6 +70,11 @@ self.addEventListener('message', (event) => {
 self.addEventListener('push', ev => {
     const data = ev.data.json()
     console.log('Got push', data)
+
+    //Broadcast message to app
+    const channel = new BroadcastChannel('sw-messages-push')
+    channel.postMessage({ gameCode: data.gameCode, test: 'coucou' })
+
     self.registration.showNotification(data.title, {
         ...data,
         body: data.title,

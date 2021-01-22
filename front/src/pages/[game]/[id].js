@@ -176,6 +176,25 @@ export default function IdGame({ gameManager, match, me }) {
         console.log(game)
     }, [game])
 
+    useEffect(() => {
+        console.log("game?.gameId has changed")
+
+        if (!!getGame && !!game?.gameId) {
+            const channel = new BroadcastChannel('sw-messages-push')
+
+            channel.addEventListener('message', ev => {
+                console.log('Received ev', ev)
+                console.log('Received', ev.data)
+                if (game?.gameId === ev?.data?.gameCode)
+                    getGame()
+            })
+        }
+
+        // return () => {
+        //     channel.removeEventListener('message')
+        // }
+    }, [game?.gameId, getGame])
+
     return (
         <main
             className="app-page-game-id"
@@ -385,13 +404,13 @@ export default function IdGame({ gameManager, match, me }) {
                     </button>
                 </div>
                 <div>
-                    <FontAwesomeIcon color="#FA0701" icon={faHeart}/>&nbsp;
+                    <FontAwesomeIcon color="#FA0701" icon={faHeart} />&nbsp;
                     <p><b>{lang('hp')}</b>: {mePlayer?.life ?? 0}</p>&nbsp;&nbsp;
-                    <FontAwesomeIcon color="#FAC601" icon={faStar}/>&nbsp;
+                    <FontAwesomeIcon color="#FAC601" icon={faStar} />&nbsp;
                     <p><b>{lang('ap')}</b>: {mePlayer?.ap ?? 0}</p>&nbsp;&nbsp;
-                    <FontAwesomeIcon color="#0AC429" icon={faShoePrints}/>&nbsp;
+                    <FontAwesomeIcon color="#0AC429" icon={faShoePrints} />&nbsp;
                     <p><b>{lang('mp')}</b>: {mePlayer?.mp ?? 0}</p>&nbsp;&nbsp;
-                    <FontAwesomeIcon color="#000000"icon={faPaw}/>&nbsp;
+                    <FontAwesomeIcon color="#000000" icon={faPaw} />&nbsp;
                     <p><b>{lang('pokemon')}</b>: {mePlayer?.pokemon?.name?.[defaultLang ?? 'en']?.toString() ?? <i>{lang('none')}</i>}</p>
                 </div>
                 <div>
