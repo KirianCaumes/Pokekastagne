@@ -1,4 +1,5 @@
 import Pretender from 'pretender'
+import store from 'redux/store'
 import { Game } from 'request/objects/game'
 import { Player } from 'request/objects/player'
 // import { Obstacle } from './objects/obstacle'
@@ -28,39 +29,20 @@ server.patch('/api/game/online/:id/:action', server.passthrough)
 // const skin = ['biker', 'cameraman', 'clown', 'girl', 'papy']
 // const pkmn = ['artikodin', 'bulbizarre', 'charkos', 'lugia', 'makuhita', 'pikachu', 'psykokwak', 'tenefix', 'tiplouf']
 
-const map = [[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null],
-[null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null],
-[null, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null],
-[null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null],
-[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null],
-[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null],
-[null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }],
-[null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }],
-[null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }],
-[null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }],
-[null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }]]
+const map = [[{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null], [null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null], [null, { type: 'obstacle' }, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null], [null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{ type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }], [null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, { type: 'obstacle' }], [null, null, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }], [null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }], [null, null, null, null, null, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }, { type: 'obstacle' }, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { type: 'obstacle' }, null, null, null, { type: 'obstacle' }, { type: 'obstacle' }]]
 
 /** @type {Game[]} */
 let games = []
 
-const FORCE_ID = process.env.NODE_ENV === 'development' ? 123 : undefined //⚠⚠ FORCE ID FOR ALL GAMES IN DEV
-
+// const FORCE_ID = process.env.NODE_ENV === 'development' ? 123 : undefined //⚠⚠ FORCE ID FOR ALL GAMES IN DEV
+const FORCE_ID = undefined
 
 server.get('/api/game/offline', (request) => {
     return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: games })]
 })
 
 server.get('/api/game/offline/:id', request => {
-    let game = games.find(x => x.gameId === (FORCE_ID || request.params?.id))
+    let game = games.find(x => x.gameId === request.params?.id)
 
     if (!game) {
         if (FORCE_ID) {
@@ -75,27 +57,18 @@ server.get('/api/game/offline/:id', request => {
 })
 
 server.post('/api/game/offline', request => {
+    const body = JSON.parse(request.requestBody)
+
     const game = {
-        ...JSON.parse(request.requestBody),
-        _id: new Date().getUTCMilliseconds(),
-        gameId: new Date().getUTCMilliseconds(),
-        startDate: new Date(),
-        map: [...map],
-        players: [
-            new Player(),
-            new Player(),
-            new Player(),
-            new Player(),
-            new Player()
-        ],
-        playersAlive: 5
+        ...getNewGame({ gameId: body.gameId, name: body.name })
     }
+
     games = [game, ...games]
     return [200, { "Content-Type": "application/json" }, JSON.stringify({ game })]
 })
 
 server.put('/api/game/offline/:id', request => {
-    let game = games.find(x => x.gameId === (FORCE_ID || request.params?.id))
+    let game = games.find(x => x.gameId === request.params?.id)
     if (game)
         return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: game })]
     else
@@ -103,25 +76,21 @@ server.put('/api/game/offline/:id', request => {
 })
 
 server.delete('/api/game/offline/:id', request => {
-    let game = games.find(x => x.gameId === (FORCE_ID || request.params?.id))
-    if (game)
-        return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: game })]
-    else
+    let gameIndex = games.findIndex(x => x.gameId === request.params?.id)
+
+    if (gameIndex < 0)
         return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
+
+    games = games.filter((_, i) => i !== gameIndex)
+
+    return [200, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
 })
 
 server.patch('/api/game/offline/:id/:action', request => {
-    let game = games.find(x => x.gameId === (FORCE_ID || request.params?.id))
+    let game = games.find(x => x.gameId === request.params?.id)
 
-    if (!game) {
-        if (FORCE_ID) {
-            const newGame = getNewGame({ gameId: FORCE_ID })
-            games = [newGame, ...games]
-            game = newGame
-        } else {
-            return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
-        }
-    }
+    if (!game)
+        return [404, { "Content-Type": "application/json" }, JSON.stringify({ game: {} })]
 
     const body = JSON.parse(request.requestBody)
 
@@ -266,7 +235,8 @@ server.patch('/api/game/offline/:id/:action', request => {
 
 
 const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
-    const myId = (new Date().getUTCMilliseconds() / 2).toString()
+    console.log(store.getState().user.me)
+    const myId = store.getState().user.me?._id ?? (new Date().getUTCMilliseconds() / 2).toString()
 
     const player1 = new Player({ _id: myId, username: 'Biker', isYourTurn: true, position: 1, skin: 'biker', mp: 3, ap: 1, life: 10 })
     const player2 = new Player({ _id: myId, username: 'Cameraman', isYourTurn: false, position: 2, skin: 'cameraman', mp: 3, ap: 1, life: 10 })
@@ -282,13 +252,19 @@ const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
 
     const customMap = [...map]
 
-    player1.pokemon = pokemon1
+    // player1.pokemon = pokemon1
+
+    // customMap[15][21] = player1
+    // customMap[3][0] = player2
+    // customMap[2][1] = player3
+    // customMap[2][2] = player4
+    // customMap[2][3] = player5
 
     customMap[2][0] = player1
-    customMap[3][0] = player2
-    customMap[2][1] = player3
-    customMap[2][2] = player4
-    customMap[2][3] = player5
+    customMap[12][0] = player2
+    customMap[0][8] = player3
+    customMap[12][8] = player4
+    customMap[17][13] = player5
 
     customMap[0][7] = pokemon1
     customMap[4][7] = pokemon2

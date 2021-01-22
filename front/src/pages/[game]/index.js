@@ -33,6 +33,9 @@ export default function IndexGame({ match, me, gameManager }) {
     const [modalCreation, setModalCreation] = useState({ isDisplay: !!false })
     /** @type {[ModalType, function(ModalType):any]} Modal */
     const [modalJoin, setModalJoin] = useState({ isDisplay: !!false })
+    /** @type {[ModalType, function(ModalType):any]} Modal */
+    const [modalDelete, setModalDelete] = useState({ isDisplay: !!false })
+
     /** @type {[Game, function(Game):any]} New game name */
     const [newGame, setNewGame] = useState(new Game())
 
@@ -95,7 +98,6 @@ export default function IndexGame({ match, me, gameManager }) {
         async () => {
             setStatus(Status.PENDING)
             try {
-                console.log(newGame.gameId)
                 await gameManager.updateById(null, newGame.gameId, type)
                 history.push(`${match.url}/${newGame.gameId}`)
                 // setGames([game, ...games])
@@ -119,6 +121,37 @@ export default function IndexGame({ match, me, gameManager }) {
             }
         },
         [gameManager, type, newGame, match]
+    )
+
+    const _delete = useCallback(
+        /**
+         * @param {Game['gameId']} gameId 
+         */
+        async (gameId) => {
+            setStatus(Status.PENDING)
+            try {
+                await gameManager.removeById(gameId, type)
+                const gameIndex = games.findIndex(x => x.gameId === gameId)
+                setGames(games.filter((_, i) => i !== gameIndex))
+                setStatus(Status.RESOLVED)
+            } catch (error) {
+                switch (error?.constructor) {
+                    case CancelRequestError: break
+                    case UnauthorizedError:
+                    case InvalidEntityError:
+                        // setErrorField(error.errorField)
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                    case NotImplementedError:
+                    default:
+                        setStatus(Status.REJECTED)
+                        console.error(error)
+                        break
+                }
+            }
+        },
+        [gameManager, type, games]
     )
 
     const lang = useLang()
@@ -146,7 +179,7 @@ export default function IndexGame({ match, me, gameManager }) {
                             {![Status.PENDING, Status.IDLE].includes(status) && games?.length > 0 &&
                                 games?.map(game => (
                                     <div
-                                        key={game.gameId}
+                                        key={`${new Date().getUTCMilliseconds()}_${game.gameId}`}
                                         className="one-game"
                                     >
                                         <Link
@@ -176,7 +209,15 @@ export default function IndexGame({ match, me, gameManager }) {
                                             {game.creatorId === me._id &&
                                                 <button
                                                     className="button is-danger"
-                                                    onClick={() => null}
+                                                    onClick={() =>
+                                                        setModalDelete({
+                                                            isDisplay: true,
+                                                            onClickYes: async () => {
+                                                                await _delete(game.gameId)
+                                                                setModalDelete({ isDisplay: false })
+                                                            }
+                                                        })
+                                                    }
                                                 >
                                                     <span className="icon is-small">
                                                         <FontAwesomeIcon icon={faTrash} />
@@ -289,6 +330,13 @@ export default function IndexGame({ match, me, gameManager }) {
                     </div>
                 </div>
             </Modal>
+
+            <Modal
+                isDisplay={modalDelete.isDisplay}
+                title={`${lang('remove')} ${lang('game')}`}
+                onClickYes={modalDelete.onClickYes}
+                onClickNo={() => setModalDelete({ isDisplay: false })}
+            />
         </>
     )
 }

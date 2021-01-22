@@ -92,22 +92,22 @@ gameRoutes.route('/:mode/:id')
         const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
         if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(mode))
-            return res.status(400).send('Syntax error, check your request url.');
+            return res.status(400).send({ error: 'Syntax error, check your request url.', stacktrace: null });
 
         GameModel.findOne({ gameId: id, gameMode: mode }).exec()
             .then(game => {
                 if (!game) {
-                    return res.status(404).send('Cannot find your game! Check your game code.');
+                    return res.status(400).send({ error: 'Cannot find your game! Check your game code.', stacktrace: null });
                 } else if (game.players.length === 5) {
-                    return res.status(400).send('The lobby is already full!');
+                    return res.status(400).send({ error: 'The lobby is already full!', stacktrace: null });
                 } else if (game.status === 'running') {
-                    return res.status(400).send('The game already started!');
+                    return res.status(400).send({ error: 'The game already started!', stacktrace: null });
                 } else if (game.status === 'finished') {
-                    return res.status(400).send('The game is already finished.');
+                    return res.status(400).send({ error: 'The game is already finished.', stacktrace: null });
                 }
 
-                if (game.players.map(p => p._id).includes(userFromToken.id))
-                    return res.status(400).send('You already are in this game!');
+                if (game.players.map(p => p._id).includes(userFromToken._id))
+                    return res.status(400).send({ error: 'You already are in this game!', stacktrace: null });
 
                 game.players.push({
                     type: 'player',
@@ -136,7 +136,7 @@ gameRoutes.route('/:mode/:id')
                     PokemonModel.find({}).exec()
                         .then(pokemon => {
                             if (pokemon.length < 5)
-                                return res.status(404).send('Not enough pokemon! Aborting.');
+                                return res.status(400).send({ error: 'Not enough pokemon! Aborting.', stacktrace: null });
 
                             game.players = shuffleArray(game.players);
 
@@ -160,8 +160,7 @@ gameRoutes.route('/:mode/:id')
                                     return res.send({ game: game });
                                 })
                                 .catch(err => {
-                                    console.error(err);
-                                    res.status(500).send('Error fetching the mapModel.');
+                                    return res.status(400).send({ error: 'Error fetching the mapModel.', stacktrace: null });
                                 });
                         })
                         .catch(err => res.status(500).send({ error: 'Error fetching pokemon.', stacktrace: JSON.stringify(err) }));
@@ -178,7 +177,7 @@ gameRoutes.route('/:mode/:id')
         const { mode, id } = req.params
         const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
 
-        GameModel.findOneAndDelete({ creatorId: userFromToken.id, gameId: id }).exec()
+        GameModel.findOneAndDelete({ creatorId: userFromToken._id, gameId: id }).exec()
             .then(() => res.send('Successfully deleted!'))
             .catch(err => res.status(500).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) }));
     });
@@ -193,14 +192,11 @@ gameRoutes.route('/:mode/:id/:move')
             y: req.body.y
         };
 
-        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode)) {
-            res.status(400).send('Syntax error for the mode, check your request url.');
-            return;
-        }
-        if (!['walk', 'attack', 'catch', 'skip'].includes(move)) {
-            res.status(400).send('Syntax error for the move, check your request url.');
-            return;
-        }
+        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode))
+            return res.status(400).send({ error: 'Syntax error for the mode, check your request url.', stacktrace: null });
+
+        if (!['walk', 'attack', 'catch', 'skip'].includes(move))
+            return res.status(400).send({ error: 'Syntax error for the move, check your request url.', stacktrace: null });
 
         GameModel.findOne({ gameId: gameId, gameMode: gameMode }).lean().exec()
             .then(async game => {
@@ -225,11 +221,6 @@ gameRoutes.route('/:mode/:id/:move')
                     return nextPos
                 })()
 
-                console.log('currentPlayerPos', currentPlayerPos)
-                console.log('currentPlayer', currentPlayer)
-                console.log('currentPlayerIndex', currentPlayerIndex)
-                console.log('nextPosition', nextPosition)
-
                 const nextPlayer = { ...game.players.find(x => x.position === nextPosition), type: 'player' }
                 const nextPlayerIndex = game.players.findIndex(x => x.position === nextPosition)
                 console.log('bonjour ', nextPlayer)
@@ -243,10 +234,6 @@ gameRoutes.route('/:mode/:id/:move')
                     }
                     throw new Error('Player next not found')
                 })()
-
-                console.log('nextPlayer', nextPlayer)
-                console.log('nextPlayerIndex', nextPlayerIndex)
-                console.log('nextPlayerPos', nextPlayerPos)
 
                 switch (move) {
                     case 'walk':
@@ -364,8 +351,7 @@ gameRoutes.route('/:mode/:id/:move')
 
             })
             .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     });
 

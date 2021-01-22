@@ -1,6 +1,6 @@
-import {Router} from 'express';
+import { Router } from 'express';
 
-import {PokemonModel} from "../data/models/Pokemon.js";
+import { PokemonModel } from "../data/models/Pokemon.js";
 
 const pokemonRoutes = Router();
 
@@ -13,8 +13,7 @@ pokemonRoutes.route('/')
                 });
             })
             .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     })
     .post((req, res) => {
@@ -28,10 +27,9 @@ pokemonRoutes.route('/')
                 });
             })
             .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     });
 
 
-export {pokemonRoutes};
+export { pokemonRoutes };

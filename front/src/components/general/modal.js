@@ -54,7 +54,7 @@ function Modal({ isDisplay, title, children, onClickYes, onClickNo }) {
                     <footer className={classNames("modal-card-foot flex-end")}>
                         <button
                             type="submit"
-                            className={classNames("button is-pink", { 'is-loading': status === Status.PENDING })}
+                            className={classNames("button is-primary", { 'is-loading': status === Status.PENDING })}
                         >
                             <span className="icon is-small">
                                 <FontAwesomeIcon icon={faCheck} />

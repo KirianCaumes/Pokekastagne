@@ -1,5 +1,5 @@
 /**
- * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none' | 'victory' | 'royale' | 'defeat' | 'backToMenu' | 'install' | 'installApp' | 'waiting' | 'roomCode'} TranslateKey
+ * @typedef {'singleplayer' | 'multiplayer' | 'howtoplay' | 'settings' | 'logout' | 'login' | 'register' | 'username' | 'email' | 'password' | 'homepage' | 'playersAlive' | 'startedAt' | 'join' | 'create' | 'noResult' | 'name' | 'game' | 'new' | 'code' | 'endOfTurn' | 'refresh' | 'ap' | 'mp' | 'yourPkmn' | 'turn' | 'nextPlayer' | 'turnNumber' | 'pkmn' | 'user' | 'moveHere' | 'attack' | 'hp' | 'pokemon' | 'infos' | 'catch' | 'attack' | 'yes' | 'none' | 'victory' | 'royale' | 'defeat' | 'backToMenu' | 'install' | 'installApp' | 'waiting' | 'roomCode' | 'remove'} TranslateKey
  */
 
 /**
@@ -194,6 +194,10 @@ const Translates = {
     roomCode: {
         fr: 'Le code de la partie est :',
         en: 'Room\'s code is:'
+    },
+    remove: {
+        fr: 'Supprimer la',
+        en: 'Remove'
     }
 }
 

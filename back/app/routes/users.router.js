@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { UserModel } from "../data/models/User.js";
 import { compare, encrypt } from "../utils/password.utils.js";
 import { authenticate, getUserFromToken, login } from "../security/auth.js";
-import {skins} from "../data/playerSkins";
+import { skins } from "../data/playerSkins";
 import webpush from "web-push";
 
 const userRoutes = Router();
@@ -19,18 +19,16 @@ userRoutes.route('/')
                 });
             })
             .catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: err });
             });
     })
     .post((req, res) => {
         // Create hash from password
         encrypt(req.body.password).then(hash => {
-            if (hash === false) {
-                res.status(500).send('issue with the password, aborting.');
-                return;
-            }
-            console.log(hash);
+            if (hash === false)
+                return res.status(400).send({ error: 'issue with the password, aborting.', stacktrace: null });
+
+            // console.log(hash);
 
             // if (!skins.values().includes(req.body.skin)) {
             //     res.status(400).send('This skin does not exist. Available skins are : ' + skins.values());
@@ -51,13 +49,12 @@ userRoutes.route('/')
                     });
                 })
                 .catch(err => {
-                    console.error(err);
-                    res.status(500).send('internal server error.');
+                    return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
                 });
-        }).catch(err => {
-            console.error(err);
-            res.status(500).send('Issue hashing the password, aborting.')
-        });
+        })
+            .catch(err => {
+                return res.status(400).send({ error: 'Issue hashing the password, aborting.', stacktrace: JSON.stringify(err) });
+            });
     });
 
 userRoutes.route('/login')
@@ -67,9 +64,8 @@ userRoutes.route('/login')
 
         UserModel.findOne({ email: email }).exec()
             .then(_user => {
-                if (!_user) {
-                    res.status(404).send('No user found with these credentials.');
-                }
+                if (!_user)
+                    return res.status(404).send({ error: 'No user found with these credentials.', stacktrace: null });
 
                 compare(password, _user.password).then(_res => {
                     if (_res) {
@@ -82,13 +78,11 @@ userRoutes.route('/login')
                         res.status(401).send('Wrong password.');
                     }
                 }).catch(err => {
-                    console.error(err);
-                    res.status(500).send('Internal server error, please retry later.');
+                    return res.status(400).send({ error: 'Internal server error, please retry later.', stacktrace: JSON.stringify(err) });
                 });
 
             }).catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     });
 
@@ -98,16 +92,16 @@ userRoutes.route('/subscribe')
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
-        UserModel.updateOne({email: userFromToken.email}).exec()
+        UserModel.updateOne({ email: userFromToken.email }).exec()
             .then(user => {
                 console.log('subscribing')
 
                 user.subscription = subscription;
 
                 user.save();
-            }).catch(err => {
-            console.error(err);
-            res.status(500).send('internal server error.');
+            })
+            .catch(err => {
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
 
         res.status(201).json({});
@@ -133,8 +127,7 @@ userRoutes.route('/me')
                 });
 
             }).catch(err => {
-                console.error(err);
-                res.status(500).send('internal server error.');
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     });
 

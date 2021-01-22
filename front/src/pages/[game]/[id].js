@@ -284,7 +284,7 @@ export default function IdGame({ gameManager, match, me }) {
                     </div>
                 }
                 {/* Winning screen */}
-                {game?.status === 'finished' && mePlayer?._id === game.players.find(player => player?.life > 0) &&
+                {game?.status === 'finished' && mePlayer?._id === game.players.find(player => player?.life > 0)?._id &&
                     <div className="win-screen">
                         <p className="top1">#1</p>
                         <p className="victory">{lang('victory')}</p>
