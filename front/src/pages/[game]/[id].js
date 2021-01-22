@@ -15,7 +15,7 @@ import { Player } from 'request/objects/player'
 import onClickOutside from "react-onclickoutside"
 import { Coord } from 'request/objects/meta/coord'// eslint-disable-line
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBackward, faForward, faSync } from '@fortawesome/free-solid-svg-icons'
+import { faBackward, faForward, faHeart, faPaw, faShoePrints, faStar, faSync } from '@fortawesome/free-solid-svg-icons'
 import classnames from 'classnames'
 import { history } from 'helpers/history'
 import useDefaultLang from 'helpers/hooks/useDefaultLang'
@@ -385,9 +385,14 @@ export default function IdGame({ gameManager, match, me }) {
                     </button>
                 </div>
                 <div>
-                    <p><b>{lang('ap')}</b>: {mePlayer?.ap ?? 0}</p>&nbsp;/&nbsp;
-                    <p><b>{lang('mp')}</b>: {mePlayer?.mp ?? 0}</p>&nbsp;/&nbsp;
-                    <p><b>{lang('yourPkmn')}</b>: {mePlayer?.pokemon?.name?.[defaultLang ?? 'en']?.toString() ?? <i>{lang('none')}</i>}</p>
+                    <FontAwesomeIcon color="#FA0701" icon={faHeart}/>&nbsp;
+                    <p><b>{lang('hp')}</b>: {mePlayer?.life ?? 0}</p>&nbsp;&nbsp;
+                    <FontAwesomeIcon color="#FAC601" icon={faStar}/>&nbsp;
+                    <p><b>{lang('ap')}</b>: {mePlayer?.ap ?? 0}</p>&nbsp;&nbsp;
+                    <FontAwesomeIcon color="#0AC429" icon={faShoePrints}/>&nbsp;
+                    <p><b>{lang('mp')}</b>: {mePlayer?.mp ?? 0}</p>&nbsp;&nbsp;
+                    <FontAwesomeIcon color="#000000"icon={faPaw}/>&nbsp;
+                    <p><b>{lang('pokemon')}</b>: {mePlayer?.pokemon?.name?.[defaultLang ?? 'en']?.toString() ?? <i>{lang('none')}</i>}</p>
                 </div>
                 <div>
                     <p><b>{lang('turn')}</b>:
