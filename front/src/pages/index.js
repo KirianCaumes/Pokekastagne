@@ -6,7 +6,7 @@ import { Section, Columns, Container, Notification, Button } from 'react-bulma-c
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faUser, faQuestionCircle, faSignOutAlt, faCogs, faDownload } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
-import usePWA from 'react-pwa-install-prompt'
+import usePWA from 'helpers/hooks/usePwa'
 
 /**
  * @param {AppProps} props
@@ -26,7 +26,7 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
-            {isModalDisplayed && /** isInstallPromptSupported && **/ !isStandalone &&
+            {isModalDisplayed && isInstallPromptSupported && !isStandalone &&
                 // {isModalDisplayed &&
                 <Notification
                     className="is-navyblue"
