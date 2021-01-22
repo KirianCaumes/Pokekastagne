@@ -48,28 +48,6 @@ app.get('/api', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/api', (req, res) => {
-    res.send('Hello World!');
-});
-
-app.post('/api/subscribe', (req, res) => {
-    const subscription = req.body;
-    const payload = JSON.stringify({ title: 'test' });
-
-    console.log(subscription);
-
-    res.status(201).send({
-        sub: subscription,
-        payload: payload
-    });
-
-
-    webpush.sendNotification(subscription, payload).catch(err => {
-        console.error(err.stack);
-    });
-});
-
-
 /**
  * APP
  */

@@ -11,7 +11,7 @@ export const UserSchema = new Schema({
     username: String,
     password: String,
     skin: String,
-    subscription: Object
+    subscriptions: []
 });
 
 export const UserModel = mongoose.model(

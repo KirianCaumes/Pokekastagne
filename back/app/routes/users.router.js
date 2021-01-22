@@ -94,9 +94,9 @@ userRoutes.route('/subscribe')
 
         UserModel.updateOne({ email: userFromToken.email }).exec()
             .then(user => {
-                console.log('subscribing')
+                console.log('subscribing');
 
-                user.subscription = subscription;
+                user.subscriptions.push(subscription);
 
                 user.save();
             })
@@ -105,13 +105,6 @@ userRoutes.route('/subscribe')
             });
 
         res.status(201).json({});
-        const payload = JSON.stringify({ title: 'Bonjour l\'amérique' });
-
-        console.log(subscription);
-
-        webpush.sendNotification(subscription, payload).catch(err => {
-            console.error(err.stack);
-        });
     });
 
 userRoutes.route('/me')

@@ -195,7 +195,7 @@ gameRoutes.route('/:mode/:id/:move')
         if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode))
             return res.status(400).send({ error: 'Syntax error for the mode, check your request url.', stacktrace: null });
 
-        if (!['walk', 'attack', 'catch', 'skip'].includes(move))
+        if (![GameConstants.ACTIONS_WALK, GameConstants.ACTIONS_ATTACK, GameConstants.ACTIONS_CATCH, GameConstants.ACTIONS_SKIP].includes(move))
             return res.status(400).send({ error: 'Syntax error for the move, check your request url.', stacktrace: null });
 
         GameModel.findOne({ gameId: gameId, gameMode: gameMode }).lean().exec()
@@ -236,7 +236,7 @@ gameRoutes.route('/:mode/:id/:move')
                 })()
 
                 switch (move) {
-                    case 'walk':
+                    case GameConstants.ACTIONS_WALK:
                         //Check if pkmn
                         if (game.map[body.y][body.x]?.type === null) //Not an empty cell
                             break
@@ -258,7 +258,7 @@ gameRoutes.route('/:mode/:id/:move')
                         game.map[body.y][body.x] = currentPlayer
                         game.players[currentPlayerIndex] = currentPlayer
                         break
-                    case 'attack':
+                    case GameConstants.ACTIONS_ATTACK:
                         if (currentPlayer.ap <= 0) //No ap
                             break
 
@@ -288,7 +288,7 @@ gameRoutes.route('/:mode/:id/:move')
 
                         game.status = game.playersAlive <= 1 ? 'finished' : 'running'
                         break
-                    case 'catch':
+                    case GameConstants.ACTIONS_CATCH:
                         //Check if pkmn
                         if (game.map[body.y][body.x]?.type !== 'pokemon') //Not a pokemon
                             break
@@ -317,7 +317,7 @@ gameRoutes.route('/:mode/:id/:move')
                         game.map[body.y][body.x] = currentPlayer
                         game.players[currentPlayerIndex] = currentPlayer
                         break
-                    case 'skip':
+                    case GameConstants.ACTIONS_SKIP:
                         //Update player
                         currentPlayer.isYourTurn = false
                         currentPlayer.ap = 1
@@ -329,6 +329,21 @@ gameRoutes.route('/:mode/:id/:move')
 
                         //Set next player turn is done
                         nextPlayer.isYourTurn = true
+                        UserModel.findOne({ _id: nextPlayer._id }).exec()
+                            .then(user => {
+                                user.subscriptions.forEach(sub => {
+                                    webpush.sendNotification(sub, JSON.stringify({
+                                        title: `It's your move trainer ${user.username}!`,
+                                        gameCode: gameId,
+                                        actions: [
+                                            { action: 'see', title: 'See' },
+                                            { action: 'close', title: 'Close' },
+                                        ],
+                                    })).catch(err => {
+                                        console.error(err.stack);
+                                    });
+                                });
+                            });
 
                         //Update pos new player
                         game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer

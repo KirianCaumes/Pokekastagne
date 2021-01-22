@@ -63,7 +63,23 @@ self.addEventListener('push', ev => {
     console.log('Got push', data)
     // @ts-ignore
     self.registration.showNotification(data.title, {
+        ...data,
         body: data.title,
-        icon: 'http://pokekastagne.herokuapp.com/icon/favicon-96x96-dunplab-manifest-27617.png'
+        icon: 'http://pokekastagne.herokuapp.com/icon/favicon-96x96-dunplab-manifest-27617.png',
+        data: { url: `/online/${data.gameCode}` }
     })
+})
+
+self.addEventListener('notificationclick', function (e) {
+    const notification = e.notification
+    const action = e.action
+    console.log('Click notification', e)
+
+    if (action === 'close') {
+        notification.close();
+    } else {
+        if (notification.data && notification.data.url)
+            clients.openWindow(notification.data.url)
+        notification.close()
+    }
 })
