@@ -327,24 +327,6 @@ gameRoutes.route('/:mode/:id/:move')
 
                         //Set next player turn is done
                         nextPlayer.isYourTurn = true
-                        UserModel.findOne({ _id: nextPlayer._id }).exec()
-                            .then(user => {
-                                user.subscriptions.forEach(sub => {
-                                    webpush.sendNotification(sub, JSON.stringify({
-                                        title: `It's your move, trainer ${user.username}!`,
-                                        gameCode: id,
-                                        actions: [
-                                            { action: 'see', title: 'See' },
-                                            { action: 'close', title: 'Close' },
-                                        ],
-                                    })).then(() => {
-                                        console.log("C'est gagné")
-                                    })
-                                        .catch(err => {
-                                            console.error(err.stack);
-                                        });
-                                });
-                            });
 
                         //Update pos new player
                         game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer
@@ -358,6 +340,27 @@ gameRoutes.route('/:mode/:id/:move')
                 }
 
                 await GameModel.findOneAndUpdate({ gameId: game.gameId }, game).exec();
+
+                if (move === GameConstants.ACTIONS_SKIP)
+                    await UserModel.findOne({ _id: nextPlayer._id }).exec()
+                        .then(user => {
+                            user.subscriptions.forEach(sub => {
+                                webpush.sendNotification(sub, JSON.stringify({
+                                    title: `It's your move, trainer ${user.username}!`,
+                                    gameCode: id,
+                                    actions: [
+                                        { action: 'see', title: 'See' },
+                                        { action: 'close', title: 'Close' },
+                                    ],
+                                }))
+                                    .then(() => {
+                                        console.log("C'est gagné")
+                                    })
+                                    .catch(err => {
+                                        console.error(err.stack);
+                                    });
+                            });
+                        });
 
                 res.send({
                     game: game

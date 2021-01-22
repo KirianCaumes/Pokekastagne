@@ -141,7 +141,7 @@ export default function IdGame({ gameManager, match, me }) {
                         case Player:
                             return null
                         default:
-                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp ? 'rgba(255,255,255,0.6)' : null
+                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp && currentPlayer?._id === mePlayer?._id ? 'rgba(255,255,255,0.6)' : null
                     }
                 })(),
                 fillColor: (() => {
@@ -165,7 +165,7 @@ export default function IdGame({ gameManager, match, me }) {
             })
             ))?.flat() ?? []
         ,
-        [game, border, size, mePlayerPos?.x, mePlayerPos?.y, mePlayer?.mp]
+        [game, border, size, mePlayerPos?.x, mePlayerPos?.y, mePlayer?.mp, currentPlayer?._id, mePlayer?._id]
     )
 
     useEffect(() => {
@@ -416,9 +416,9 @@ export default function IdGame({ gameManager, match, me }) {
                 <div>
                     <p><b>{lang('turn')}</b>:
                         <span
-                            className={classnames({ 'has-text-danger': mePlayer?._id === me._id })}
+                            className={classnames({ 'has-text-danger': currentPlayer?._id === mePlayer?._id })}
                             style={{
-                                fontWeight: mePlayer?._id === me._id ? 'bold' : undefined
+                                fontWeight: currentPlayer?._id === mePlayer?._id ? 'bold' : undefined
                             }}
                         >
                             &nbsp;{currentPlayer?.username}
