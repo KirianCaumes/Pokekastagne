@@ -53,7 +53,7 @@ registerRoute(
 //Cache api
 registerRoute(
     /(\/api\/game\/online|\/api\/user\/me)/,
-    new StaleWhileRevalidate({
+    new NetworkFirst({
         cacheName: 'pokekastagne-api',
         plugins: [
             new ExpirationPlugin({ maxEntries: 50 }),
