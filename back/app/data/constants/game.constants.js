@@ -8,7 +8,7 @@ export const GameConstants = {
     STATUS_RUNNING: 'running',
     STATUS_FINISHED: 'finished',
 
-    MAX_PLAYERS: 2,
+    MAX_PLAYERS: process.env.MAX_PLAYERS || 2,
 
     ACTIONS_WALK: 'walk',
     ACTIONS_ATTACK: 'attack',
