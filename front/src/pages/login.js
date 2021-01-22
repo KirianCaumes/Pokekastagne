@@ -15,7 +15,6 @@ import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { NotImplementedError } from 'request/errors/notImplementedError'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
-import { initNotificationService } from "../serviceWorkerRegistration"
 
 /**
  * @param {AppProps} props
@@ -80,6 +79,8 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
                         src={require('assets/img/logo.png').default}
                         alt="Pokékastagne"
                         className="logo"
+                        width="745px"
+                        height="188px"
                     />
                     <br />
                     <br />
@@ -96,7 +97,9 @@ export default function Login({ userManager, signIn, isAuthenticated }) {
                                     <div className="notification is-danger">
                                         <button
                                             className="delete"
+                                            type="button"
                                             onClick={() => setErrorMessage(null)}
+                                            aria-label="delete"
                                         />
                                         {errorMessage}
                                     </div>

@@ -38,6 +38,17 @@
   ],
   "icons": [
     {
+      "src": "/icon/maskable_icon_x1.png",
+      "type": "image/png",
+      "sizes": "349x349",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon/android-icon-512x512-dunplab-manifest-27617.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
       "src": "/icon/android-icon-192x192-dunplab-manifest-27617.png",
       "type": "image/png",
       "sizes": "192x192"

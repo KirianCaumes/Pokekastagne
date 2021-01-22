@@ -1,9 +1,9 @@
-import {Router} from 'express';
+import { Router } from 'express';
 
-import {UserModel} from "../data/models/User.js";
-import {compare, encrypt} from "../utils/password.utils.js";
-import {authenticate, getUserFromToken, login} from "../security/auth.js";
-import {getRandomSkin} from "../utils/user.utils.js";
+import { UserModel } from "../data/models/User.js";
+import { compare, encrypt } from "../utils/password.utils.js";
+import { authenticate, getUserFromToken, login } from "../security/auth.js";
+import { getRandomSkin } from "../utils/user.utils.js";
 
 const userRoutes = Router();
 
@@ -16,14 +16,14 @@ userRoutes.route('/')
                 });
             })
             .catch(err => {
-                return res.status(400).send({error: 'internal server error.', stacktrace: err});
+                return res.status(400).send({ error: 'internal server error.', stacktrace: err });
             });
     })
     .post((req, res) => {
         // Create hash from password
         encrypt(req.body.password).then(hash => {
             if (hash === false)
-                return res.status(400).send({error: 'issue with the password, aborting.', stacktrace: null});
+                return res.status(400).send({ error: 'issue with the password, aborting.', stacktrace: null });
 
             // console.log(hash);
 
@@ -46,7 +46,7 @@ userRoutes.route('/')
                     });
                 })
                 .catch(err => {
-                    return res.status(400).send({error: 'internal server error.', stacktrace: JSON.stringify(err)});
+                    return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
                 });
         })
             .catch(err => {
@@ -60,12 +60,12 @@ userRoutes.route('/')
 userRoutes.route('/login')
     .post((req, res) => {
         // Login user
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
-        UserModel.findOne({email: email}).exec()
+        UserModel.findOne({ email: email }).exec()
             .then(_user => {
                 if (!_user)
-                    return res.status(404).send({error: 'No user found with these credentials.', stacktrace: null});
+                    return res.status(404).send({ error: 'No user found with these credentials.', stacktrace: null });
 
                 compare(password, _user.password).then(_res => {
                     if (_res) {
@@ -85,8 +85,8 @@ userRoutes.route('/login')
                 });
 
             }).catch(err => {
-            return res.status(400).send({error: 'internal server error.', stacktrace: JSON.stringify(err)});
-        });
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
+            });
     });
 
 userRoutes.route('/subscribe')
@@ -97,24 +97,23 @@ userRoutes.route('/subscribe')
 
         delete subscription.expirationTime;
 
+        console.log('subscription added!', subscription);
+
         UserModel.findOneAndUpdate(
-            {email: userFromToken.email},
+            { email: userFromToken.email },
             {
                 $push: {
-                    subscriptions: {
-                        ...subscription,
-                        creationDate: new Date()
-                    }
+                    subscriptions: subscription
                 }
 
             }).exec()
             .then(() => {
-                console.log('Subscribing');
+                console.log('subscribing');
 
                 res.status(201).json({});
             })
             .catch(err => {
-                return res.status(400).send({error: 'internal server error.', stacktrace: JSON.stringify(err)});
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
             });
     });
 
@@ -124,18 +123,18 @@ userRoutes.route('/me')
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
-        UserModel.findOne({email: userFromToken.email}).exec()
+        UserModel.findOne({ email: userFromToken.email }).exec()
             .then(_user => {
                 if (!_user)
-                    return res.status(404).send({error: 'No user found with these credentials.', stacktrace: null});
+                    return res.status(400).send({ error: 'No user found with these credentials.', stacktrace: null });
 
                 res.send({
                     user: _user
                 });
 
             }).catch(err => {
-            return res.status(400).send({error: 'internal server error.', stacktrace: JSON.stringify(err)});
-        });
+                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
+            });
     });
 
-export {userRoutes};
+export { userRoutes };

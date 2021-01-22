@@ -10,14 +10,16 @@ import { appRoutes } from "./routes/app.router.js";
 import { userRoutes } from './routes/users.router.js';
 import { gameRoutes } from "./routes/game.router.js";
 import { mapModelRoutes } from "./routes/mapmodel.router.js";
-import {pokemonRoutes} from "./routes/pokemon.router.js";
+import { pokemonRoutes } from "./routes/pokemon.router.js";
 import { authenticate } from "./security/auth.js";
+import sslRedirect from 'heroku-ssl-redirect';
 
 
 /**
  * PARAMS
  */
 const app = express();
+app.use(sslRedirect());
 app.use(bodyParser.json());
 
 
@@ -33,7 +35,6 @@ const CONFIG = {
 dotenv.config();
 
 webpush.setVapidDetails('mailto:malo.dupont@ynov.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
-
 
 /**
  * ROUTES

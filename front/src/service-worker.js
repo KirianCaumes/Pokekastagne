@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { clientsClaim, setCacheNameDetails } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
@@ -15,7 +16,6 @@ setCacheNameDetails({
     runtime: 'run-time'
 })
 
-// @ts-ignore
 precacheAndRoute(self.__WB_MANIFEST)
 
 registerRoute(
@@ -72,15 +72,12 @@ registerRoute(
 //Force current sw to be used
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING')
-        // @ts-ignore
         self.skipWaiting()
 })
 
 self.addEventListener('push', ev => {
-    // @ts-ignore
     const data = ev.data.json()
     console.log('Got push', data)
-    // @ts-ignore
     self.registration.showNotification(data.title, {
         ...data,
         body: data.title,
@@ -89,10 +86,10 @@ self.addEventListener('push', ev => {
     })
 })
 
-self.addEventListener('notificationclick', function (e) {
-    const notification = e.notification
-    const action = e.action
-    console.log('Click notification', e)
+self.addEventListener('notificationclick', ev => {
+    const notification = ev.notification
+    const action = ev.action
+    console.log('Click notification', ev)
 
     if (action === 'close') {
         notification.close();

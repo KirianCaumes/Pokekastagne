@@ -17,7 +17,7 @@ import { init, signIn, signOut } from 'redux/slices/user'// eslint-disable-line
 import { UserState, PayloadInit, PayloadSingIn } from 'redux/slices/user'// eslint-disable-line
 import { PrivateRoute, PublicRoute } from 'components/routes'
 import IdGame from 'pages/[game]/[id]'
-import {initNotificationService} from "./serviceWorkerRegistration";
+import { initNotificationService } from "./serviceWorkerRegistration";
 
 /**
  * Global components props
@@ -61,7 +61,7 @@ const _IdGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IdGame
 /**
  * @param {AppProps} props
  */
-function _App({ userManager, isAuthenticated, init }) {
+function _App({ userManager, isAuthenticated, init, signOut }) {
     /** @type {[boolean, function(boolean):any]} Init */
     const [isInit, setIsInit] = React.useState(!!false)
 
@@ -75,12 +75,14 @@ function _App({ userManager, isAuthenticated, init }) {
                         init({ me })
                         setIsInit(true)
                     } catch (error) {
+                        setIsInit(true)
+                        signOut()
                         console.error(error)
                     }
                 }
             })()
         },
-        [isAuthenticated, userManager, init]
+        [isAuthenticated, userManager, init, signOut]
     )
 
     return (

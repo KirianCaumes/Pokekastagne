@@ -27,6 +27,7 @@ export default function Index({ signOut, me }) {
             }}
         >
             {isModalDisplayed && isInstallPromptSupported && !isStandalone &&
+                // {isModalDisplayed &&
                 <Notification
                     className="is-navyblue"
                 >
@@ -46,6 +47,7 @@ export default function Index({ signOut, me }) {
                         </span>
                     </button>
                     <Button
+                        renderAs="a"
                         remove
                         onClick={() => {
                             setIsModalDisplayed(false)
@@ -61,6 +63,8 @@ export default function Index({ signOut, me }) {
                         src={require('assets/img/logo.png').default}
                         alt="Pokékastagne"
                         className="logo"
+                        width="745px"
+                        height="188px"
                     />
                     <br />
                     <br />
@@ -97,7 +101,7 @@ export default function Index({ signOut, me }) {
                         <Columns>
                             <Columns.Column>
                                 <Link
-                                    className="button is-large is-yellow is-fullwidth"
+                                    className="button is-large is-orange is-fullwidth"
                                     to="/"
                                     // @ts-ignore
                                     disabled
@@ -110,7 +114,7 @@ export default function Index({ signOut, me }) {
                             </Columns.Column>
                             <Columns.Column>
                                 <button
-                                    className="button is-large is-orange is-fullwidth"
+                                    className="button is-large is-yellow is-fullwidth"
                                     onClick={() => signOut()}
                                 >
                                     <span>{lang('logout')}</span>

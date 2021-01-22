@@ -72,6 +72,8 @@ export default function Register({ userManager, signIn }) {
                         src={require('assets/img/logo.png').default}
                         alt="Pokékastagne"
                         className="logo"
+                        width="745px"
+                        height="188px"
                     />
                     <br />
                     <br />
@@ -88,7 +90,9 @@ export default function Register({ userManager, signIn }) {
                                     <div className="notification is-danger">
                                         <button
                                             className="delete"
+                                            type="button"
                                             onClick={() => setErrorMessage(null)}
+                                            aria-label="delete"
                                         />
                                         {errorMessage}
                                     </div>
