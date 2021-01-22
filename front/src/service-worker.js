@@ -66,7 +66,7 @@ self.addEventListener('push', ev => {
         ...data,
         body: data.title,
         icon: 'http://pokekastagne.herokuapp.com/icon/favicon-96x96-dunplab-manifest-27617.png',
-        data: { url: `/online/${data.gameCode}` }
+        data: { url: `/multiplayer/${data.gameCode}` }
     })
 })
 

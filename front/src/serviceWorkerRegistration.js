@@ -149,38 +149,53 @@ export function initNotificationService() {
         console.log('Registering push')
         navigator.serviceWorker.ready
             .then(function (registration) {
-            console.log('Registering push')
-            if (!registration.pushManager) {
-                console.warn('Push manager unavailable.')
-                return
-            }
+                console.log('Registering push')
+                if (!registration.pushManager) {
+                    console.warn('Push manager unavailable.')
+                    return
+                }
 
-            registration.pushManager
-                .subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                })
-                .then(newSub => {
-                    console.log('fetching')
-                    fetch('/api/user/subscribe', {
-                        method: 'POST',
-                        body: JSON.stringify(newSub),
-                        headers: {
-                            'content-type': 'application/json',
-                            'authorization': `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEY)}`
+
+                registration.pushManager
+                    .getSubscription()
+                    .then(function (subscription) {
+                        if (subscription === null) {
+                            console.log('No subscription detected, make a request.')
+
+                            registration.pushManager
+                                .subscribe({
+                                    userVisibleOnly: true,
+                                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                                })
+                                .then(newSub => {
+                                    console.log('fetching')
+                                    fetch('/api/user/subscribe', {
+                                        method: 'POST',
+                                        body: JSON.stringify(newSub),
+                                        headers: {
+                                            'content-type': 'application/json',
+                                            'authorization': `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEY)}`
+                                        }
+                                    }).then(() => {
+                                        console.log('Sent push!')
+                                    })
+                                })
+                                .catch(err => {
+                                    if (Notification.permission !== 'granted') {
+                                        console.log('Permission was not granted.')
+                                    } else {
+                                        console.error('An error occurred during the subscription process.', err)
+                                    }
+                                })
+                        } else {
+                            console.log('Existing subscription detected.')
                         }
-                    }).then(() => {
-                        console.log('Sent push!')
+                    }).catch(err => {
+                        console.error('An error occurred during Service Worker registration.', err)
                     })
-                })
-                .catch(err => {
-                    if (Notification.permission !== 'granted') {
-                        console.log('Permission was not granted.')
-                    } else {
-                        console.error('An error ocurred during the subscription process.', err)
-                    }
-                })
-        })
+            }).catch(err => {
+                console.error('Service worker is not ready.', err)
+            })
     }
 }
 

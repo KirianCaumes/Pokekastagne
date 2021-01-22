@@ -325,10 +325,7 @@ gameRoutes.route('/:mode/:id/:move')
                         nextPlayer.isYourTurn = true
                         UserModel.findOne({ _id: nextPlayer._id }).exec()
                             .then(user => {
-                                console.log('pour l user', user);
                                 user.subscriptions.forEach(sub => {
-                                    console.log('une subscription arrive', sub);
-
                                     webpush.sendNotification(sub, JSON.stringify({
                                         title: `It's your move, trainer ${user.username}!`,
                                         gameCode: gameId,
