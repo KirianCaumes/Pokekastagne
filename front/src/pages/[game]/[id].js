@@ -191,9 +191,6 @@ export default function IdGame({ gameManager, match, me }) {
         // }
     }, [game?.gameId, getGame])
 
-    console.log(Math.abs(modalInfos.x - mePlayerPos?.x), Math.abs(modalInfos.y - mePlayerPos?.y))
-    console.log(Math.abs(modalInfos?.x - mePlayerPos?.x), Math.abs(modalInfos?.y - mePlayerPos?.y), mePlayer?.mp)
-
     return (
         <main
             className="app-page-game-id"

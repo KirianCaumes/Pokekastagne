@@ -52,13 +52,24 @@ registerRoute(
 
 //Cache api
 registerRoute(
-    /(\/api\/game\/online|\/api\/user\/me)/,
+    /(\/api\/game\/online$|\/api\/user\/me)/,
     new NetworkFirst({
         cacheName: 'pokekastagne-api',
         plugins: [
             new ExpirationPlugin({ maxEntries: 50 }),
         ],
     })
+)
+
+/** {@link | https://developers.google.com/web/tools/workbox/modules/workbox-background-sync} */
+registerRoute(
+    /\/api\/game\/online\/.....\/(walk|attack|catch|skip)/,
+    new NetworkOnly({
+        plugins: [new BackgroundSyncPlugin('pokekastagne-queue', {
+            maxRetentionTime: 24 * 60
+        })]
+    }),
+    'POST'
 )
 
 //Force current sw to be used

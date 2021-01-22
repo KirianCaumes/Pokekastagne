@@ -235,7 +235,6 @@ server.patch('/api/game/offline/:id/:action', request => {
 
 
 const getNewGame = ({ name = "MyName", gameId = undefined } = {}) => {
-    console.log(store.getState().user.me)
     const myId = store.getState().user.me?._id ?? (new Date().getUTCMilliseconds() / 2).toString()
 
     const player1 = new Player({ _id: myId, username: 'Biker', isYourTurn: true, position: 1, skin: 'biker', mp: 3, ap: 1, life: 10 })

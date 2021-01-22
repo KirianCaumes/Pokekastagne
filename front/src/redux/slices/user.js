@@ -56,7 +56,6 @@ const userSlice = createSlice({
          * @param {PayloadAction} action
          */
         signOut: (state) => {
-            console.log("signout")
             localStorage.removeItem(process.env.REACT_APP_LOCAL_STORAGE_KEY)
             state.isAuthenticated = false
         },
