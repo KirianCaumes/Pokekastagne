@@ -10,7 +10,7 @@ import { appRoutes } from "./routes/app.router.js";
 import { userRoutes } from './routes/users.router.js';
 import { gameRoutes } from "./routes/game.router.js";
 import { mapModelRoutes } from "./routes/mapmodel.router.js";
-import {pokemonRoutes} from "./routes/pokemon.router.js";
+import { pokemonRoutes } from "./routes/pokemon.router.js";
 import { authenticate } from "./security/auth.js";
 
 
@@ -34,6 +34,7 @@ dotenv.config();
 
 webpush.setVapidDetails('mailto:malo.dupont@ynov.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
+app.use((req, res, next) => process.env.NODE_ENV === 'production' && !req.secure ? res.redirect('https://' + req.headers.host + req.url) : next());
 
 /**
  * ROUTES

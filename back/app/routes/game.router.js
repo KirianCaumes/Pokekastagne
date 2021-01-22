@@ -7,7 +7,7 @@ import { MapModelModel } from "../data/models/MapModel";
 import webpush from "web-push";
 import { UserModel } from "../data/models/User";
 import { GameConstants } from "../data/constants/game.constants";
-import {getAtk} from "../utils/game.utils";
+import { getAtk } from "../utils/game.utils";
 
 const gameRoutes = Router();
 
@@ -185,21 +185,21 @@ gameRoutes.route('/:mode/:id')
 
 gameRoutes.route('/:mode/:id/:move')
     .patch((req, res) => {
-        const gameMode = req.params.mode;
-        const move = req.params.move;
-        const gameId = req.params.id;
+        const { mode, move, id } = req.params;
         const body = {
             x: req.body.x,
             y: req.body.y
         };
 
-        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(gameMode))
+        const userFromToken = getUserFromToken(req.headers.authorization.split(' ')?.[1]);
+
+        if (![GameConstants.ONLINE, GameConstants.OFFLINE].includes(mode))
             return res.status(400).send({ error: 'Syntax error for the mode, check your request url.', stacktrace: null });
 
         if (![GameConstants.ACTIONS_WALK, GameConstants.ACTIONS_ATTACK, GameConstants.ACTIONS_CATCH, GameConstants.ACTIONS_SKIP].includes(move))
             return res.status(400).send({ error: 'Syntax error for the move, check your request url.', stacktrace: null });
 
-        GameModel.findOne({ gameId: gameId, gameMode: gameMode }).lean().exec()
+        GameModel.findOne({ gameId: id, gameMode: mode }).lean().exec()
             .then(async game => {
                 const currentPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
@@ -211,7 +211,10 @@ gameRoutes.route('/:mode/:id/:move')
                     throw new Error('Player current not found')
                 })()
                 const currentPlayer = { ...game.map[currentPlayerPos.y][currentPlayerPos.x], type: 'player' }
-                const currentPlayerIndex = game.players.findIndex(x => x._id.toString() === currentPlayer._id.toString()) //Based on uniq username for test
+                const currentPlayerIndex = game.players.findIndex(x => x._id.toString() === currentPlayer._id.toString())
+
+                if (currentPlayer?._id?.toString() !== userFromToken?._id?.toString())
+                    return res.status(400).send({ error: 'Noy your turn 😑', stacktrace: null });
 
                 const nextPosition = (() => {
                     const _getNextPos = (pos = currentPlayer.position) => pos < game.players.length ? pos + 1 : 1
@@ -329,7 +332,7 @@ gameRoutes.route('/:mode/:id/:move')
                                 user.subscriptions.forEach(sub => {
                                     webpush.sendNotification(sub, JSON.stringify({
                                         title: `It's your move, trainer ${user.username}!`,
-                                        gameCode: gameId,
+                                        gameCode: id,
                                         actions: [
                                             { action: 'see', title: 'See' },
                                             { action: 'close', title: 'Close' },
@@ -338,8 +341,8 @@ gameRoutes.route('/:mode/:id/:move')
                                         console.log("C'est gagné")
                                     })
                                         .catch(err => {
-                                        console.error(err.stack);
-                                    });
+                                            console.error(err.stack);
+                                        });
                                 });
                             });
 

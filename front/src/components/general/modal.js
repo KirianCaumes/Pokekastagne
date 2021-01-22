@@ -40,7 +40,8 @@ function Modal({ isDisplay, title, children, onClickYes, onClickNo }) {
                         <p className="modal-card-title">{title}</p>
                         <button
                             className="delete"
-                            aria-label="close"
+                            aria-label="delete"
+                            type="button"
                             onClick={() => {
                                 onClickNo?.()
                             }}

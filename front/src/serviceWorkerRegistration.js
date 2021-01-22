@@ -101,7 +101,7 @@ function registerValidSW(swUrl, config) {
 function checkValidServiceWorker(swUrl, config) {
     // Check if the service worker can be found. If it can't reload the page.
     fetch(swUrl, {
-        headers: {'Service-Worker': 'script'},
+        headers: { 'Service-Worker': 'script' },
     })
         .then((response) => {
             // Ensure service worker exists, and that we really are getting a JS file.
@@ -129,7 +129,7 @@ function checkValidServiceWorker(swUrl, config) {
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4)
     const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
+        .replace(/\-/g, '+') // eslint-disable-line
         .replace(/_/g, '/')
 
     const rawData = window.atob(base64);

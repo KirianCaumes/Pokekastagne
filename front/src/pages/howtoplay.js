@@ -26,6 +26,8 @@ export default function Howtoplay({ test }) {
                         src={require('assets/img/logo.png').default}
                         alt="Pokékastagne"
                         className="logo"
+                        width="745px"
+                        height="188px"
                     />
                     <br />
                     <br />
