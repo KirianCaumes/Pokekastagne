@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { BackgroundSyncPlugin } from 'workbox-background-sync'
 import { clientsClaim, setCacheNameDetails } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
