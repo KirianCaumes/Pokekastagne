@@ -2,6 +2,9 @@
 
 main.app-page-game-index {
   .main-content {
+    .hero-body {
+      padding: 2rem 1.5rem;
+    }
     > .one-game {
       @include flex-row();
       &:nth-last-child(2) {

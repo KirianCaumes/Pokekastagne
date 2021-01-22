@@ -107,8 +107,8 @@ function _App({ userManager, isAuthenticated, init, signOut }) {
                     />
                     <PrivateRoute
                         path="/:gametype(singleplayer|multiplayer)"
-                        // component={() => <Suspense fallback={<FullLoader />}><AppIndexGame /></Suspense>}
-                        component={AppIndexGame}
+                        component={() => <Suspense fallback={<FullLoader />}><AppIndexGame /></Suspense>}
+                        // component={AppIndexGame}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}
                         title="Game"

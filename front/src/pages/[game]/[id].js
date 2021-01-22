@@ -8,7 +8,7 @@ import { UnauthorizedError } from 'request/errors/unauthorizedError'
 import { InvalidEntityError } from 'request/errors/invalidEntityError'
 import { NotImplementedError } from 'request/errors/notImplementedError'
 import { NotFoundError } from 'request/errors/notFoundError'
-import ImageMapper from 'react-image-mapper';
+import ImageMapper from 'react-image-mapper'
 import { Pokemon } from 'request/objects/pokemon'
 import { Obstacle } from 'request/objects/obstacle'
 import { Player } from 'request/objects/player'
@@ -131,6 +131,18 @@ export default function IdGame({ gameManager, match, me }) {
                         (x + 1) * size + ((x) * border),
                         (y + 1) * size + ((y) * border),
                     ]
+                })(),
+                preFillColor: (() => {
+                    switch (cell?.constructor) {
+                        case Pokemon:
+                            return null
+                        case Obstacle:
+                            return null
+                        case Player:
+                            return null
+                        default:
+                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp ? 'rgba(255,255,255,0.6)' : null
+                    }
                 })(),
                 fillColor: (() => {
                     switch (cell?.constructor) {
@@ -292,7 +304,7 @@ export default function IdGame({ gameManager, match, me }) {
                     </div>
                 }
                 {/* Losing screen */}
-                {mePlayer?.life < 0 &&
+                {mePlayer?.life <= 0 &&
                     <div className="lose-screen">
                         <div>
                             <p className="defeat">{lang('defeat')}</p>
@@ -378,7 +390,16 @@ export default function IdGame({ gameManager, match, me }) {
                     <p><b>{lang('yourPkmn')}</b>: {mePlayer?.pokemon?.name?.[defaultLang ?? 'en']?.toString() ?? <i>{lang('none')}</i>}</p>
                 </div>
                 <div>
-                    <p><b>{lang('turn')}</b>: {currentPlayer?.username}</p>&nbsp;/&nbsp;
+                    <p><b>{lang('turn')}</b>:
+                        <span
+                            className={classnames({ 'has-text-danger': mePlayer?._id === me._id })}
+                            style={{
+                                fontWeight: mePlayer?._id === me._id ? 'bold' : undefined
+                            }}
+                        >
+                            &nbsp;{currentPlayer?.username}
+                        </span>
+                    </p>&nbsp;/&nbsp;
                     <p><b>{lang('nextPlayer')}</b>: {nextPlayer?.username}</p>
                 </div>
                 <p><b>{lang('turnNumber')}</b>: {game.turnNumber ?? ''}</p>

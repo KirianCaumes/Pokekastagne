@@ -231,7 +231,13 @@ export default function IndexGame({ match, me, gameManager }) {
                                 ))
                             }
                             {![Status.PENDING, Status.IDLE].includes(status) && games?.length <= 0 &&
-                                <h2 className="has-text-black title is-4">{lang('noResult')}</h2>
+                                <section className="hero is-orange is-bold">
+                                    <div className="hero-body">
+                                        <div className="container">
+                                            <h1 className="title is-4 has-text-centered">{lang('noResult')}</h1>
+                                        </div>
+                                    </div>
+                                </section>
                             }
 
                             {[Status.PENDING, Status.IDLE].includes(status) &&
