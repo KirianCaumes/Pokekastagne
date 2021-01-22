@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { history } from 'helpers/history'
-import { Switch, Router, Route } from 'react-router-dom'
+import { Switch, Router, Route, withRouter } from 'react-router-dom'
 import { RouteChildrenProps } from 'react-router-dom'// eslint-disable-line
 import { connect } from "react-redux"
 import { PayloadTest, CommonState } from 'redux/slices/common'// eslint-disable-line
 import { setTest } from 'redux/slices/common'
-import Login from 'pages/login'
-import Index from 'pages'
 import withManagers from 'helpers/hocs/withManagers'
 import { ManagersProps } from 'helpers/hocs/withManagers'// eslint-disable-line
-import Register from 'pages/register'
-import Howtoplay from 'pages/howtoplay'
-import IndexGame from 'pages/[game]/index'
 import 'request/pretender'
 import { init, signIn, signOut } from 'redux/slices/user'// eslint-disable-line
 import { UserState, PayloadInit, PayloadSingIn } from 'redux/slices/user'// eslint-disable-line
 import { PrivateRoute, PublicRoute } from 'components/routes'
-import IdGame from 'pages/[game]/[id]'
 import { initNotificationService } from "./serviceWorkerRegistration";
+import { FullLoader } from 'components/visuals/fullLoader'
+// import Index from './pages/index'
+// import Login from './pages/login'
+// import Register from './pages/register'
+// import Howtoplay from './pages/howtoplay'
+// import IndexGame from './pages/[game]/index'
+// import IdGame from './pages/[game]/[id]'
 
 /**
  * Global components props
@@ -51,12 +52,19 @@ const mapStateToProps = state => ({
     me: state.user.me,
 })
 
-const _Index = connect(mapStateToProps, mapDispatchToProps)(withManagers(Index))
-const _Login = connect(mapStateToProps, mapDispatchToProps)(withManagers(Login))
-const _Register = connect(mapStateToProps, mapDispatchToProps)(withManagers(Register))
-const _Howtoplay = connect(mapStateToProps, mapDispatchToProps)(withManagers(Howtoplay))
-const _IndexGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IndexGame))
-const _IdGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IdGame))
+const AppIndex = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/index')))))
+const AppLogin = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/login')))))
+const AppRegister = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/register')))))
+const AppHowtoplay = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/howtoplay')))))
+const AppIndexGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/[game]/index')))))
+const AppIdGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(withRouter(React.lazy(() => import('./pages/[game]/[id]')))))
+
+// const AppIndex = connect(mapStateToProps, mapDispatchToProps)(withManagers(Index))
+// const AppLogin = connect(mapStateToProps, mapDispatchToProps)(withManagers(Login))
+// const AppRegister = connect(mapStateToProps, mapDispatchToProps)(withManagers(Register))
+// const AppHowtoplay = connect(mapStateToProps, mapDispatchToProps)(withManagers(Howtoplay))
+// const AppIndexGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IndexGame))
+// const AppIdGame = connect(mapStateToProps, mapDispatchToProps)(withManagers(IdGame))
 
 /**
  * @param {AppProps} props
@@ -91,28 +99,32 @@ function _App({ userManager, isAuthenticated, init, signOut }) {
                 <Switch>
                     <PrivateRoute
                         path="/:gametype(singleplayer|multiplayer)/:id"
-                        component={_IdGame}
+                        component={() => <Suspense fallback={<FullLoader />}><AppIdGame /></Suspense>}
+                        // component={AppIdGame}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}
-                        title="Game!"
+                        title="Let's Game!"
                     />
                     <PrivateRoute
                         path="/:gametype(singleplayer|multiplayer)"
-                        component={_IndexGame}
+                        // component={() => <Suspense fallback={<FullLoader />}><AppIndexGame /></Suspense>}
+                        component={AppIndexGame}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}
                         title="Game"
                     />
                     <PrivateRoute
                         path="/how-to-play"
-                        component={_Howtoplay}
+                        component={() => <Suspense fallback={<FullLoader />}><AppHowtoplay /></Suspense>}
+                        // component={AppHowtoplay}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}
                         title="How to play"
                     />
                     <PrivateRoute
                         path="/"
-                        component={_Index}
+                        component={() => <Suspense fallback={<FullLoader />}><AppIndex /> </Suspense>}
+                        // component={AppIndex}
                         isAuthenticated={isAuthenticated}
                         isInit={isInit}
                         exact
@@ -121,12 +133,14 @@ function _App({ userManager, isAuthenticated, init, signOut }) {
 
                     <PublicRoute
                         path="/login"
-                        component={_Login}
+                        component={() => <Suspense fallback={<FullLoader />}><AppLogin /></Suspense>}
+                        // component={AppLogin}
                         title="Login"
                     />
                     <PublicRoute
                         path="/register"
-                        component={_Register}
+                        component={() => <Suspense fallback={<FullLoader />}><AppRegister /></Suspense>}
+                        // component={AppRegister}
                         title="Register"
                     />
                     <Route

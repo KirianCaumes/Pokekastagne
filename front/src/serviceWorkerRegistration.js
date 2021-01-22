@@ -155,7 +155,6 @@ export function initNotificationService() {
                     return
                 }
 
-
                 registration.pushManager
                     .getSubscription()
                     .then(function (subscription) {

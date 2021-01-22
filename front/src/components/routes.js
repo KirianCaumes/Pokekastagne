@@ -16,7 +16,7 @@ const setTitle = (title) => document.title = title ? `${title} - ${process.env.R
  * @property {boolean} isAuthenticated Is user authentificated
  * @property {boolean} isInit Is app init
  * @property {string | function(object):string} title Page name
- * @property {ReactComponentElement | ConnectedComponent<any, any>} component Component to render
+ * @property {ReactComponentElement | ConnectedComponent<any, any> | function():JSX.Element} component Component to render
  * 
  * @typedef {_PrivateRouteProps & RouteProps} PrivateRouteProps
  */
@@ -52,7 +52,7 @@ export const PrivateRoute = (props) => {
 /**
  * @typedef {object} _PublicRouteProps
  * @property {string | function(object):string} title Page name
- * @property {ReactComponentElement | ConnectedComponent<any, any>} component Component to render
+ * @property {ReactComponentElement | ConnectedComponent<any, any> | function():JSX.Element} component Component to render
  * 
  * @typedef {_PublicRouteProps & RouteProps} PublicRouteProps
  */
