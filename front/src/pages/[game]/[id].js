@@ -153,7 +153,7 @@ export default function IdGame({ gameManager, match, me }) {
                         case Player:
                             return "rgba(233,212,96,0.4)"
                         default:
-                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp ? 'rgba(255,255,255,0.4)' : 'rgba(207,0,15,0.8)'
+                            return Math.abs(x - mePlayerPos?.x) + Math.abs(y - mePlayerPos?.y) <= mePlayer?.mp && currentPlayer?._id === mePlayer?._id ? 'rgba(255,255,255,0.4)' : 'rgba(207,0,15,0.8)'
                     }
                 })(),
                 props: {
@@ -177,14 +177,10 @@ export default function IdGame({ gameManager, match, me }) {
     }, [game])
 
     useEffect(() => {
-        console.log("game?.gameId has changed")
-
         if (!!getGame && !!game?.gameId) {
             const channel = new BroadcastChannel('sw-messages-push')
 
             channel.addEventListener('message', ev => {
-                console.log('Received ev', ev)
-                console.log('Received', ev.data)
                 if (game?.gameId === ev?.data?.gameCode)
                     getGame()
             })
@@ -194,6 +190,9 @@ export default function IdGame({ gameManager, match, me }) {
         //     channel.removeEventListener('message')
         // }
     }, [game?.gameId, getGame])
+
+    console.log(Math.abs(modalInfos.x - mePlayerPos?.x), Math.abs(modalInfos.y - mePlayerPos?.y))
+    console.log(Math.abs(modalInfos?.x - mePlayerPos?.x), Math.abs(modalInfos?.y - mePlayerPos?.y), mePlayer?.mp)
 
     return (
         <main

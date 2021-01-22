@@ -341,7 +341,7 @@ gameRoutes.route('/:mode/:id/:move')
 
                 await GameModel.findOneAndUpdate({ gameId: game.gameId }, game).exec();
 
-                if (move === GameConstants.ACTIONS_SKIP)
+                if (move === GameConstants.ACTIONS_SKIP || game.status === GameConstants.STATUS_FINISHED)
                     await UserModel.findOne({ _id: nextPlayer._id }).exec()
                         .then(user => {
                             user.subscriptions.forEach(sub => {
