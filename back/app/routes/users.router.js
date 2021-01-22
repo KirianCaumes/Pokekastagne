@@ -32,22 +32,29 @@ userRoutes.route('/')
             //     return;
             // }
 
-            UserModel.create({
-                email: req.body.email,
-                username: req.body.username,
-                password: hash,
-                skin: getRandomSkin()
-            })
-                .then(_user => {
-                    res.send({
-                        user: {
-                            token: login(_user)
-                        }
-                    });
+            UserModel.findOne({email: req.body.email}).exec()
+                .then(user => {
+                    if (user) {
+                        return res.status(422).send('This email already exists!');
+                    } else {
+                        UserModel.create({
+                            email: req.body.email,
+                            username: req.body.username,
+                            password: hash,
+                            skin: getRandomSkin()
+                        })
+                            .then(_user => {
+                                res.send({
+                                    user: {
+                                        token: login(_user)
+                                    }
+                                });
+                            })
+                            .catch(err => {
+                                return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
+                            });
+                    }
                 })
-                .catch(err => {
-                    return res.status(400).send({ error: 'internal server error.', stacktrace: JSON.stringify(err) });
-                });
         })
             .catch(err => {
                 return res.status(400).send({
