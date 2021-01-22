@@ -149,7 +149,6 @@ export function initNotificationService() {
         console.log('Registering push')
         navigator.serviceWorker.ready
             .then(function (registration) {
-                console.log('Registering push')
                 if (!registration.pushManager) {
                     console.warn('Push manager unavailable.')
                     return
@@ -170,7 +169,11 @@ export function initNotificationService() {
                                     console.log('fetching')
                                     fetch('/api/user/subscribe', {
                                         method: 'POST',
-                                        body: JSON.stringify(newSub),
+                                        body: JSON.stringify(
+                                            {
+                                                ...JSON.parse(JSON.stringify(newSub)),
+                                                userAgent: navigator.userAgent
+                                            }),
                                         headers: {
                                             'content-type': 'application/json',
                                             'authorization': `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEY)}`
