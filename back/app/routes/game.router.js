@@ -7,6 +7,7 @@ import { MapModelModel } from "../data/models/MapModel";
 import webpush from "web-push";
 import { UserModel } from "../data/models/User";
 import { GameConstants } from "../data/constants/game.constants";
+import {getAtk} from "../utils/game.utils";
 
 const gameRoutes = Router();
 
@@ -267,7 +268,7 @@ gameRoutes.route('/:mode/:id/:move')
                         const targetPlayerIndex = game.players.findIndex(x => x.username === targetPlayer.username) //Based on uniq username for test
 
                         //Update target player
-                        targetPlayer.life -= currentPlayer.pokemon?.attack
+                        targetPlayer.life -= getAtk(currentPlayer.pokemon?.attack)
 
                         if (targetPlayer.life <= 0)
                             game.playersAlive -= 1

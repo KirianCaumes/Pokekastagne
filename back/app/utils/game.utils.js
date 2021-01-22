@@ -123,6 +123,14 @@ function findPlayerCoords(map, player) {
     }
 }
 
+function getAtk(val = 0) {
+    const ratio = 15;
+    const min = val - Math.round(val/100 * ratio);
+    const max = val + Math.round(val/100 * ratio);
+    let values = new Array(max - min).fill({}).map((x,i) => min + i);
+    return values[Math.floor(Math.random() * values.length)];
+}
+
 function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * i)
@@ -135,4 +143,4 @@ function shuffleArray(arr) {
 }
 
 
-export {generateCode, getNewMap, summonPokemon, findPlayerCoords, shuffleArray};
+export {generateCode, getNewMap, summonPokemon, findPlayerCoords, getAtk, shuffleArray};
