@@ -95,7 +95,7 @@ gameRoutes.route('/:mode/:id')
             return res.status(400).send({ error: 'Syntax error, check your request url.', stacktrace: null });
 
         GameModel.findOne({ gameId: id, gameMode: mode }).exec()
-            .then(game => {
+            .then(async game => {
                 if (!game) {
                     return res.status(400).send({ error: 'Cannot find your game! Check your game code.', stacktrace: null });
                 } else if (game.players.length === 5) {
@@ -138,7 +138,7 @@ gameRoutes.route('/:mode/:id')
                             if (pokemon.length < 5)
                                 return res.status(400).send({ error: 'Not enough pokemon! Aborting.', stacktrace: null });
 
-                            game.players = shuffleArray(game.players);
+                            game.players = game.players.sort(() => Math.random() - 0.5);
 
                             for (let i = 0; i < game.players.length; i++)
                                 game.players[i].position = i + 1;
@@ -149,13 +149,13 @@ gameRoutes.route('/:mode/:id')
                             const shuffledPkmn = shuffleArray(pokemon)
 
                             MapModelModel.find({}).exec()
-                                .then(mapModels => {
+                                .then(async mapModels => {
                                     const chosenModel = mapModels[Math.floor(Math.random() * mapModels.length)];
 
                                     game.map = getNewMap(game.players, shuffledPkmn, chosenModel.map);
                                     game.pngImg = chosenModel.pngImg;
 
-                                    game.save();
+                                    await GameModel.findOneAndUpdate({ gameId: game.gameId }, game).exec();
 
                                     return res.send({ game: game });
                                 })
@@ -165,7 +165,7 @@ gameRoutes.route('/:mode/:id')
                         })
                         .catch(err => res.status(500).send({ error: 'Error fetching pokemon.', stacktrace: JSON.stringify(err) }));
                 } else {
-                    game.save();
+                    await GameModel.findOneAndUpdate({ gameId: game.gameId }, game).exec();
 
                     return res.send({ game: game });
                 }
