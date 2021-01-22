@@ -26,7 +26,7 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
-            {isModalDisplayed && isInstallPromptSupported && !isStandalone &&
+            {isModalDisplayed && isInstallPromptSupported && isStandalone &&
                 // {isModalDisplayed &&
                 <Notification
                     className="is-navyblue"
