@@ -2,7 +2,7 @@ import { clientsClaim, setCacheNameDetails } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
-import { StaleWhileRevalidate } from 'workbox-strategies'
+import {NetworkFirst, StaleWhileRevalidate} from 'workbox-strategies'
 
 //Force current sw to be used
 clientsClaim()
@@ -47,6 +47,25 @@ registerRoute(
         plugins: [
             new ExpirationPlugin({ maxEntries: 50 }),
         ],
+    })
+)
+
+//Cache image
+registerRoute(
+    "https://pokekastagne-test.herokuapp.com/api/user/me",
+    new StaleWhileRevalidate({
+        cacheName: 'me',
+        plugins: [
+            new ExpirationPlugin({ maxEntries: 1 }),
+        ],
+    })
+)
+
+// cache online party
+registerRoute(
+    "/api/game/online",
+    new NetworkFirst({
+        cacheName: 'onlineParty'
     })
 )
 

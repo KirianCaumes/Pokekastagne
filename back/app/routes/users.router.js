@@ -97,18 +97,19 @@ userRoutes.route('/subscribe')
 
         delete subscription.expirationTime;
 
-        console.log('subscription added!', subscription);
-
         UserModel.findOneAndUpdate(
             {email: userFromToken.email},
             {
                 $push: {
-                    subscriptions: subscription
+                    subscriptions: {
+                        ...subscription,
+                        creationDate: new Date()
+                    }
                 }
 
             }).exec()
             .then(() => {
-                console.log('subscribing');
+                console.log('Subscribing');
 
                 res.status(201).json({});
             })
@@ -125,6 +126,9 @@ userRoutes.route('/me')
 
         UserModel.findOne({email: userFromToken.email}).exec()
             .then(_user => {
+                if (!_user)
+                    return res.status(404).send({error: 'No user found with these credentials.', stacktrace: null});
+
                 res.send({
                     user: _user
                 });
