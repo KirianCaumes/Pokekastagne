@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useLang from 'helpers/hooks/useLang'
 import { AppProps } from 'app'// eslint-disable-line
 // @ts-ignore
@@ -15,9 +15,25 @@ export default function Index({ signOut, me }) {
     /** @type {[boolean, function(boolean):any]} Modal */
     const [isModalDisplayed, setIsModalDisplayed] = useState(!!true)
 
-    const { isStandalone, isInstallPromptSupported, promptInstall } = usePWA()
-
     const lang = useLang()
+
+    /** @type {[boolean, function(boolean):any]} Supports PWA */
+    const [supportsPWA, setSupportsPWA] = useState(!!false)
+    /** @type {[any, function(any):any]} PromptInstall */
+    const [promptInstall, setPromptInstall] = useState(null)
+
+    useEffect(() => {
+        const handler = e => {
+            e.preventDefault();
+            console.log("we are being triggered :D", e)
+            setSupportsPWA(true)
+            setPromptInstall(e)
+        };
+        window.addEventListener("beforeinstallprompt", handler)
+
+        return () => window.removeEventListener("beforeinstallprompt", handler)
+    }, [])
+
 
     return (
         <main
@@ -26,7 +42,7 @@ export default function Index({ signOut, me }) {
                 backgroundImage: `url(${require('assets/img/background.png').default})`
             }}
         >
-            {isModalDisplayed && isInstallPromptSupported && !isStandalone &&
+            {supportsPWA &&
                 // {isModalDisplayed &&
                 <Notification
                     className="is-navyblue"
@@ -34,11 +50,12 @@ export default function Index({ signOut, me }) {
                     <button
                         className="button is-orange"
                         type="button"
-                        onClick={async () => {
-                            const didInstall = await promptInstall()
-                            if (didInstall) {
-                                setIsModalDisplayed(false)
-                            }
+                        onClick={evt => {
+                            evt.preventDefault()
+                            if (!promptInstall)
+                                return
+                            promptInstall.prompt()
+                            setIsModalDisplayed(false)
                         }}
                     >
                         <span>{lang('installApp')}</span>
