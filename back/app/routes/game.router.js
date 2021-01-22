@@ -159,7 +159,7 @@ gameRoutes.route('/:mode/:id')
 
                                     return res.send({ game: game });
                                 })
-                                .catch(err => {
+                                .catch(() => {
                                     return res.status(400).send({ error: 'Error fetching the mapModel.', stacktrace: null });
                                 });
                         })
@@ -223,7 +223,6 @@ gameRoutes.route('/:mode/:id/:move')
 
                 const nextPlayer = { ...game.players.find(x => x.position === nextPosition), type: 'player' }
                 const nextPlayerIndex = game.players.findIndex(x => x.position === nextPosition)
-                console.log('bonjour ', nextPlayer)
 
                 const nextPlayerPos = (() => {
                     for (const [y, row] of game.map.entries()) {
@@ -241,15 +240,10 @@ gameRoutes.route('/:mode/:id/:move')
                         if (game.map[body.y][body.x]?.type === null) //Not an empty cell
                             break
 
-                        console.log(currentPlayer)
-
                         currentPlayer.mp -= Math.abs(body.x - currentPlayerPos.x) + Math.abs(body.y - currentPlayerPos.y)
 
                         if (currentPlayer.mp < 0) //Not enough mp
                             break
-
-                        console.log(currentPlayer)
-
 
                         //Clear current player cell
                         game.map[currentPlayerPos.y][currentPlayerPos.x] = null
@@ -331,15 +325,21 @@ gameRoutes.route('/:mode/:id/:move')
                         nextPlayer.isYourTurn = true
                         UserModel.findOne({ _id: nextPlayer._id }).exec()
                             .then(user => {
+                                console.log('pour l user', user);
                                 user.subscriptions.forEach(sub => {
+                                    console.log('une subscription arrive', sub);
+
                                     webpush.sendNotification(sub, JSON.stringify({
-                                        title: `It's your move trainer ${user.username}!`,
+                                        title: `It's your move, trainer ${user.username}!`,
                                         gameCode: gameId,
                                         actions: [
                                             { action: 'see', title: 'See' },
                                             { action: 'close', title: 'Close' },
                                         ],
-                                    })).catch(err => {
+                                    })).then(() => {
+                                        console.log("C'est gagné")
+                                    })
+                                        .catch(err => {
                                         console.error(err.stack);
                                     });
                                 });
@@ -347,9 +347,7 @@ gameRoutes.route('/:mode/:id/:move')
 
                         //Update pos new player
                         game.map[nextPlayerPos.y][nextPlayerPos.x] = nextPlayer
-                        console.log('nextPlayer', nextPlayer)
                         game.players[nextPlayerIndex] = nextPlayer
-                        console.log('game', JSON.stringify(game))
 
                         if (nextPosition === 1)
                             game.turnNumber += 1

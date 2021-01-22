@@ -95,6 +95,10 @@ userRoutes.route('/subscribe')
         const token = req.headers.authorization.split(' ')[1];
         const userFromToken = getUserFromToken(token);
 
+        delete subscription.expirationTime;
+
+        console.log('subscription added!', subscription);
+
         UserModel.findOneAndUpdate(
             {email: userFromToken.email},
             {
