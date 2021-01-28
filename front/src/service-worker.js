@@ -53,7 +53,7 @@ registerRoute(
 
 //Cache api
 registerRoute(
-    /(\/api\/game\/online$|\/api\/user\/me)/,
+    /(\/api\/game\/online|\/api\/user\/me)/,
     new NetworkFirst({
         cacheName: 'pokekastagne-api',
         plugins: [

@@ -9,7 +9,7 @@
   "theme_color": "#3d7dca",
   "dir": "ltr",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "prefer_related_applications": false,
   "related_applications": [
     {
